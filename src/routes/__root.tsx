@@ -73,14 +73,18 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
+      { title: "Shoxjahon Asqarov" },
+      { name: "description", content: "Pixel Perfect Pro transforms design images into fully functional, responsive web applications." },
       { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      { property: "og:title", content: "Shoxjahon Asqarov" },
+      { property: "og:description", content: "Pixel Perfect Pro transforms design images into fully functional, responsive web applications." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@Lovable" },
+      { name: "twitter:title", content: "Shoxjahon Asqarov" },
+      { name: "twitter:description", content: "Pixel Perfect Pro transforms design images into fully functional, responsive web applications." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/18e644de-ebd2-42cf-be15-83deede7ba41/id-preview-0cdc697c--49a48028-6941-4a99-b9e4-f42a182d94f7.lovable.app-1779075722789.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/18e644de-ebd2-42cf-be15-83deede7ba41/id-preview-0cdc697c--49a48028-6941-4a99-b9e4-f42a182d94f7.lovable.app-1779075722789.png" },
     ],
     links: [
       {
