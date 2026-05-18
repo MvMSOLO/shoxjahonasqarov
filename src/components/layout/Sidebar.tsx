@@ -87,7 +87,7 @@ export function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
                   : "text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-foreground"
               )}
             >
-              <Icon className="h-4.5 w-4.5 shrink-0" />
+              <Icon className="h-[18px] w-[18px] shrink-0" />
               <span className="truncate">{item.label}</span>
               {active && (
                 <motion.span
