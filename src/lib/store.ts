@@ -2,6 +2,7 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
 export type Theme = "dark" | "light";
+export type Lighting = "dim" | "normal" | "bright";
 
 export type Todo = {
   id: string;
@@ -34,6 +35,14 @@ type AppState = {
   removeTodo: (id: string) => void;
   notifications: Notification[];
   markAllRead: () => void;
+  audioEnabled: boolean;
+  toggleAudio: () => void;
+  volume: number;
+  setVolume: (v: number) => void;
+  lighting: Lighting;
+  cycleLighting: () => void;
+  sidebarCollapsed: boolean;
+  toggleSidebar: () => void;
 };
 
 const initialTodos: Todo[] = [
@@ -49,6 +58,8 @@ const initialNotifs: Notification[] = [
   { id: "n3", title: "Test natijasi", body: "Linux Test 1: 92/100", time: "3 soat oldin", read: false },
 ];
 
+const lightingOrder: Lighting[] = ["dim", "normal", "bright"];
+
 export const useApp = create<AppState>()(
   persist(
     (set) => ({
@@ -60,17 +71,24 @@ export const useApp = create<AppState>()(
       logout: () => set({ user: null }),
       todos: initialTodos,
       addTodo: (t) =>
-        set((s) => ({
-          todos: [...s.todos, { ...t, id: crypto.randomUUID(), done: false }],
-        })),
+        set((s) => ({ todos: [...s.todos, { ...t, id: crypto.randomUUID(), done: false }] })),
       toggleTodo: (id) =>
-        set((s) => ({
-          todos: s.todos.map((t) => (t.id === id ? { ...t, done: !t.done } : t)),
-        })),
+        set((s) => ({ todos: s.todos.map((t) => (t.id === id ? { ...t, done: !t.done } : t)) })),
       removeTodo: (id) => set((s) => ({ todos: s.todos.filter((t) => t.id !== id) })),
       notifications: initialNotifs,
       markAllRead: () =>
         set((s) => ({ notifications: s.notifications.map((n) => ({ ...n, read: true })) })),
+      audioEnabled: false,
+      toggleAudio: () => set((s) => ({ audioEnabled: !s.audioEnabled })),
+      volume: 0.4,
+      setVolume: (v) => set({ volume: v }),
+      lighting: "normal",
+      cycleLighting: () =>
+        set((s) => ({
+          lighting: lightingOrder[(lightingOrder.indexOf(s.lighting) + 1) % lightingOrder.length],
+        })),
+      sidebarCollapsed: false,
+      toggleSidebar: () => set((s) => ({ sidebarCollapsed: !s.sidebarCollapsed })),
     }),
     { name: "edupro-app" }
   )
