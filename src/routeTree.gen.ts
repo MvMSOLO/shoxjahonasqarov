@@ -13,6 +13,7 @@ import { Route as SupportRouteImport } from './routes/support'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as LearningRouteImport } from './routes/learning'
 import { Route as GradesRouteImport } from './routes/grades'
+import { Route as GalleryRouteImport } from './routes/gallery'
 import { Route as FinanceRouteImport } from './routes/finance'
 import { Route as IndexRouteImport } from './routes/index'
 
@@ -36,6 +37,11 @@ const GradesRoute = GradesRouteImport.update({
   path: '/grades',
   getParentRoute: () => rootRouteImport,
 } as any)
+const GalleryRoute = GalleryRouteImport.update({
+  id: '/gallery',
+  path: '/gallery',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const FinanceRoute = FinanceRouteImport.update({
   id: '/finance',
   path: '/finance',
@@ -50,6 +56,7 @@ const IndexRoute = IndexRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/finance': typeof FinanceRoute
+  '/gallery': typeof GalleryRoute
   '/grades': typeof GradesRoute
   '/learning': typeof LearningRoute
   '/settings': typeof SettingsRoute
@@ -58,6 +65,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/finance': typeof FinanceRoute
+  '/gallery': typeof GalleryRoute
   '/grades': typeof GradesRoute
   '/learning': typeof LearningRoute
   '/settings': typeof SettingsRoute
@@ -67,6 +75,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/finance': typeof FinanceRoute
+  '/gallery': typeof GalleryRoute
   '/grades': typeof GradesRoute
   '/learning': typeof LearningRoute
   '/settings': typeof SettingsRoute
@@ -77,16 +86,25 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/finance'
+    | '/gallery'
     | '/grades'
     | '/learning'
     | '/settings'
     | '/support'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/finance' | '/grades' | '/learning' | '/settings' | '/support'
+  to:
+    | '/'
+    | '/finance'
+    | '/gallery'
+    | '/grades'
+    | '/learning'
+    | '/settings'
+    | '/support'
   id:
     | '__root__'
     | '/'
     | '/finance'
+    | '/gallery'
     | '/grades'
     | '/learning'
     | '/settings'
@@ -96,6 +114,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   FinanceRoute: typeof FinanceRoute
+  GalleryRoute: typeof GalleryRoute
   GradesRoute: typeof GradesRoute
   LearningRoute: typeof LearningRoute
   SettingsRoute: typeof SettingsRoute
@@ -132,6 +151,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof GradesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/gallery': {
+      id: '/gallery'
+      path: '/gallery'
+      fullPath: '/gallery'
+      preLoaderRoute: typeof GalleryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/finance': {
       id: '/finance'
       path: '/finance'
@@ -152,6 +178,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   FinanceRoute: FinanceRoute,
+  GalleryRoute: GalleryRoute,
   GradesRoute: GradesRoute,
   LearningRoute: LearningRoute,
   SettingsRoute: SettingsRoute,
@@ -160,3 +187,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
