@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Bell, Search, Sun, Moon, Menu, Check, Volume2, VolumeX, ArrowRight } from "lucide-react";
+import { Bell, Search, Sun, Moon, Menu, Check, Volume2, VolumeX, ArrowRight, User, Settings as SettingsIcon, LogOut } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useApp } from "@/lib/store";
@@ -13,16 +13,19 @@ import {
   DropdownMenuSeparator,
   DropdownMenuLabel,
 } from "@/components/ui/dropdown-menu";
+import { Popover, PopoverContent, PopoverTrigger, PopoverAnchor } from "@/components/ui/popover";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet";
 import { Sidebar } from "./Sidebar";
+import { toast } from "sonner";
 
 type SearchResult = { label: string; to: string; kind: string };
 
 export function Topbar() {
-  const { theme, toggleTheme, notifications, markAllRead, audioEnabled, toggleAudio, logout } = useApp();
+  const { theme, toggleTheme, notifications, markAllRead, markRead, audioEnabled, toggleAudio, logout } = useApp();
   const [query, setQuery] = useState("");
   const [searchOpen, setSearchOpen] = useState(false);
   const [sheetOpen, setSheetOpen] = useState(false);
+  const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
   const navigate = useNavigate();
   const unread = notifications.filter((n) => !n.read).length;
 
@@ -32,7 +35,9 @@ export function Topbar() {
     const pages = [
       { label: "Dashboard", to: "/", kind: "Sahifa" },
       { label: "3D Galereya", to: "/gallery", kind: "Sahifa" },
+      { label: "Davomat va Baholar", to: "/grades", kind: "Sahifa" },
       { label: "Moliya", to: "/finance", kind: "Sahifa" },
+      { label: "Yordam", to: "/support", kind: "Sahifa" },
       { label: "Sozlamalar", to: "/settings", kind: "Sahifa" },
     ];
     return [...pages, ...courseItems, ...todayItems];
@@ -44,11 +49,23 @@ export function Topbar() {
     return allItems.filter((i) => i.label.toLowerCase().includes(q)).slice(0, 6);
   }, [query, allItems]);
 
+  function pickResult(r: SearchResult) {
+    navigate({ to: r.to });
+    setQuery("");
+    setSearchOpen(false);
+    setMobileSearchOpen(false);
+  }
+
+  function handleLogout() {
+    logout();
+    toast.success("Sessiya yopildi");
+  }
+
   return (
     <header className="sticky top-0 z-30 flex items-center gap-2 border-b border-border bg-background/75 px-3 py-3 backdrop-blur-xl md:gap-3 md:px-6 md:py-4">
       <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
         <SheetTrigger asChild>
-          <button className="grid h-10 w-10 place-items-center rounded-xl border border-border bg-card lg:hidden">
+          <button className="grid h-10 w-10 place-items-center rounded-xl border border-border bg-card lg:hidden" aria-label="Menyu">
             <Menu className="h-5 w-5" />
           </button>
         </SheetTrigger>
@@ -74,51 +91,86 @@ export function Topbar() {
           <div className="text-[10px] text-muted-foreground">Bugun zo'r kun</div>
         </div>
 
-        {/* Search desktop */}
-        <div className="relative hidden md:block">
-          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <Input
-            value={query}
-            onChange={(e) => { setQuery(e.target.value); setSearchOpen(true); }}
-            onFocus={() => setSearchOpen(true)}
-            onBlur={() => setTimeout(() => setSearchOpen(false), 180)}
-            placeholder="Kurs, dars, sahifa qidirish..."
-            className="w-56 rounded-xl border-border bg-card pl-9 lg:w-72"
-          />
-          <AnimatePresence>
-            {searchOpen && results.length > 0 && (
-              <motion.div
-                initial={{ opacity: 0, y: -4 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -4 }}
-                className="absolute left-0 right-0 top-full z-40 mt-2 overflow-hidden rounded-xl border border-border bg-popover shadow-card"
-              >
-                {results.map((r) => (
-                  <button
-                    key={r.label}
-                    onMouseDown={(e) => {
-                      e.preventDefault();
-                      navigate({ to: r.to });
-                      setQuery("");
-                      setSearchOpen(false);
-                    }}
-                    className="flex w-full items-center gap-3 px-3 py-2.5 text-left text-sm transition-colors hover:bg-accent"
-                  >
-                    <span className="rounded-md bg-muted px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-                      {r.kind}
-                    </span>
-                    <span className="flex-1 truncate">{r.label}</span>
-                    <ArrowRight className="h-3.5 w-3.5 text-muted-foreground" />
-                  </button>
-                ))}
-              </motion.div>
-            )}
-          </AnimatePresence>
+        {/* Search desktop — Popover so dropdown is portaled (no overlap with sidebar) */}
+        <div className="hidden md:block">
+          <Popover open={searchOpen && results.length > 0} onOpenChange={setSearchOpen}>
+            <PopoverAnchor asChild>
+              <div className="relative">
+                <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <Input
+                  value={query}
+                  onChange={(e) => { setQuery(e.target.value); setSearchOpen(true); }}
+                  onFocus={() => setSearchOpen(true)}
+                  placeholder="Kurs, dars, sahifa qidirish..."
+                  className="w-56 rounded-xl border-border bg-card pl-9 lg:w-72"
+                />
+              </div>
+            </PopoverAnchor>
+            <PopoverContent
+              align="end"
+              sideOffset={8}
+              onOpenAutoFocus={(e) => e.preventDefault()}
+              className="w-[var(--radix-popover-trigger-width)] min-w-[260px] p-1"
+            >
+              {results.map((r) => (
+                <button
+                  key={r.label + r.kind}
+                  onClick={() => pickResult(r)}
+                  className="flex w-full items-center gap-3 rounded-lg px-2.5 py-2 text-left text-sm transition-colors hover:bg-accent"
+                >
+                  <span className="rounded-md bg-muted px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                    {r.kind}
+                  </span>
+                  <span className="flex-1 truncate">{r.label}</span>
+                  <ArrowRight className="h-3.5 w-3.5 text-muted-foreground" />
+                </button>
+              ))}
+            </PopoverContent>
+          </Popover>
         </div>
+
+        {/* Mobile search trigger */}
+        <Popover open={mobileSearchOpen} onOpenChange={setMobileSearchOpen}>
+          <PopoverTrigger asChild>
+            <button className="grid h-10 w-10 place-items-center rounded-xl border border-border bg-card md:hidden" aria-label="Qidirish">
+              <Search className="h-[18px] w-[18px]" />
+            </button>
+          </PopoverTrigger>
+          <PopoverContent align="end" sideOffset={8} className="w-[calc(100vw-24px)] max-w-sm p-2">
+            <div className="relative">
+              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                autoFocus
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Qidirish..."
+                className="rounded-xl bg-card pl-9"
+              />
+            </div>
+            <div className="mt-2 max-h-72 overflow-y-auto">
+              {results.length === 0 && query && (
+                <div className="px-2 py-3 text-center text-sm text-muted-foreground">Hech narsa topilmadi</div>
+              )}
+              {results.map((r) => (
+                <button
+                  key={r.label + r.kind}
+                  onClick={() => pickResult(r)}
+                  className="flex w-full items-center gap-3 rounded-lg px-2.5 py-2.5 text-left text-sm transition-colors hover:bg-accent"
+                >
+                  <span className="rounded-md bg-muted px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                    {r.kind}
+                  </span>
+                  <span className="flex-1 truncate">{r.label}</span>
+                  <ArrowRight className="h-3.5 w-3.5 text-muted-foreground" />
+                </button>
+              ))}
+            </div>
+          </PopoverContent>
+        </Popover>
 
         {/* Audio toggle */}
         <button
-          onClick={toggleAudio}
+          onClick={() => { toggleAudio(); toast(audioEnabled ? "Ovoz o'chirildi" : "Ambient ovoz yoqildi"); }}
           aria-label="Toggle ambient audio"
           title="Atrof-muhit ovozi"
           className="grid h-10 w-10 place-items-center rounded-xl border border-border bg-card transition-colors hover:bg-accent"
@@ -129,7 +181,7 @@ export function Topbar() {
         {/* Notifications */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <button className="relative grid h-10 w-10 place-items-center rounded-xl border border-border bg-card transition-colors hover:bg-accent">
+            <button className="relative grid h-10 w-10 place-items-center rounded-xl border border-border bg-card transition-colors hover:bg-accent" aria-label="Bildirishnomalar">
               <Bell className="h-[18px] w-[18px]" />
               {unread > 0 && (
                 <span className="absolute -right-1 -top-1 grid h-5 w-5 place-items-center rounded-full bg-destructive text-[10px] font-bold text-destructive-foreground">
@@ -142,14 +194,14 @@ export function Topbar() {
             <div className="flex items-center justify-between px-2 py-1.5">
               <DropdownMenuLabel className="p-0">Bildirishnomalar</DropdownMenuLabel>
               <button onClick={markAllRead} className="text-xs text-primary hover:underline">
-                Hammasini o'qildi qilish
+                Hammasini o'qildi
               </button>
             </div>
             <DropdownMenuSeparator />
             <AnimatePresence>
               {notifications.map((n) => (
                 <motion.div key={n.id} initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }}>
-                  <DropdownMenuItem className="flex flex-col items-start gap-0.5 py-2.5">
+                  <DropdownMenuItem onClick={() => markRead(n.id)} className="flex flex-col items-start gap-0.5 py-2.5">
                     <div className="flex w-full items-center gap-2">
                       {!n.read && <span className="h-2 w-2 rounded-full bg-primary" />}
                       <span className="text-sm font-medium">{n.title}</span>
@@ -181,14 +233,17 @@ export function Topbar() {
               <span className="hidden text-sm font-medium md:inline">{profile.name.split(" ")[0]}</span>
             </button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-52">
+          <DropdownMenuContent align="end" className="w-56">
             <DropdownMenuLabel className="flex flex-col">
               <span>{profile.name}</span>
               <span className="text-xs font-normal text-muted-foreground">Level {profile.level}</span>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild>
-              <Link to="/settings">Profil sozlamalari</Link>
+              <Link to="/settings"><User className="mr-2 h-4 w-4" /> Profil</Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link to="/settings"><SettingsIcon className="mr-2 h-4 w-4" /> Sozlamalar</Link>
             </DropdownMenuItem>
             <DropdownMenuItem asChild>
               <Link to="/finance">Moliya</Link>
@@ -197,8 +252,8 @@ export function Topbar() {
               <Link to="/support">Yordam</Link>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={logout} className="text-destructive focus:text-destructive">
-              Chiqish
+            <DropdownMenuItem onClick={handleLogout} className="text-destructive focus:text-destructive">
+              <LogOut className="mr-2 h-4 w-4" /> Chiqish
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

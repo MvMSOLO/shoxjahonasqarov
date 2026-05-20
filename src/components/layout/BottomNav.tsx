@@ -1,15 +1,17 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { Home, BookOpen, Wallet, User2, Boxes } from "lucide-react";
+import { Home, BookOpen, Wallet, User2, Boxes, LucideIcon } from "lucide-react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 
-const tabs = [
+type Tab = { to: string; label: string; icon: LucideIcon; primary?: boolean };
+
+const tabs: Tab[] = [
   { to: "/", label: "Bosh", icon: Home },
   { to: "/learning", label: "O'quv", icon: BookOpen },
   { to: "/gallery", label: "3D", icon: Boxes, primary: true },
   { to: "/finance", label: "Moliya", icon: Wallet },
   { to: "/settings", label: "Profil", icon: User2 },
-] as const;
+];
 
 export function BottomNav() {
   const path = useRouterState({ select: (s) => s.location.pathname });
@@ -49,15 +51,8 @@ export function BottomNav() {
                     transition={{ type: "spring", stiffness: 380, damping: 32 }}
                   />
                 )}
-                <Icon
-                  className={cn("relative h-5 w-5", active ? "text-primary" : "text-muted-foreground")}
-                />
-                <span
-                  className={cn(
-                    "relative text-[10px] font-medium",
-                    active ? "text-primary" : "text-muted-foreground"
-                  )}
-                >
+                <Icon className={cn("relative h-5 w-5", active ? "text-primary" : "text-muted-foreground")} />
+                <span className={cn("relative text-[10px] font-medium", active ? "text-primary" : "text-muted-foreground")}>
                   {t.label}
                 </span>
               </Link>
