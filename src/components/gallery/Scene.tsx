@@ -1,11 +1,20 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, Suspense } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { Html, MeshReflectorMaterial, Float, RoundedBox, Environment } from "@react-three/drei";
+import { MeshReflectorMaterial, Float, RoundedBox, Environment, Sparkles, useTexture } from "@react-three/drei";
 import * as THREE from "three";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useApp } from "@/lib/store";
-import { Link } from "@tanstack/react-router";
+import { useNavigate } from "@tanstack/react-router";
+import { motion, AnimatePresence } from "framer-motion";
+import { Sparkles as SparkIcon, X, ArrowRight } from "lucide-react";
+
+import reactImg from "@/assets/gallery/react.jpg";
+import nodeImg from "@/assets/gallery/node.jpg";
+import devopsImg from "@/assets/gallery/devops.jpg";
+import uiuxImg from "@/assets/gallery/uiux.jpg";
+import pythonImg from "@/assets/gallery/python.jpg";
+import linuxImg from "@/assets/gallery/linux.jpg";
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
@@ -19,31 +28,34 @@ type Room = {
   accent: string;
   percent: number;
   blurb: string;
-  cta: string;
+  image: string;
+  details: string;
+  duration: string;
+  lessons: number;
 };
 
 const ROOMS: Room[] = [
-  { id: "react", name: "React Advanced", tag: "Frontend", color: "#6366F1", accent: "#A78BFA", percent: 68, blurb: "Hooks, Suspense, Server Components va arxitektura.", cta: "Davom etish" },
-  { id: "node", name: "Node.js & API", tag: "Backend", color: "#10B981", accent: "#34D399", percent: 45, blurb: "Express, Fastify, REST va gRPC servislari.", cta: "Boshlash" },
-  { id: "devops", name: "DevOps Basic", tag: "Infra", color: "#F59E0B", accent: "#FCD34D", percent: 42, blurb: "Docker, Kubernetes va CI/CD pipeline'lar.", cta: "Davom etish" },
-  { id: "ux", name: "UI / UX Design", tag: "Design", color: "#F43F5E", accent: "#FB7185", percent: 30, blurb: "Auditoriya tadqiqoti, prototip, design system.", cta: "Boshlash" },
-  { id: "py", name: "Python Backend", tag: "Backend", color: "#06B6D4", accent: "#67E8F9", percent: 55, blurb: "FastAPI, async, ORM va deployment.", cta: "Davom etish" },
-  { id: "linux", name: "Linux & Shell", tag: "Sysadmin", color: "#8B5CF6", accent: "#C4B5FD", percent: 60, blurb: "Bash, networking, server hardening.", cta: "Davom etish" },
+  { id: "react", name: "React Advanced", tag: "Frontend", color: "#22D3EE", accent: "#67E8F9", percent: 68, blurb: "Hooks, Suspense, Server Components.", image: reactImg, details: "Zamonaviy React arxitekturasi, performance optimizatsiya va testing.", duration: "8 hafta", lessons: 24 },
+  { id: "node", name: "Node.js & API", tag: "Backend", color: "#10B981", accent: "#34D399", percent: 45, blurb: "Express, REST va gRPC servislari.", image: nodeImg, details: "Production-ready API qurish, autentifikatsiya, microservices.", duration: "10 hafta", lessons: 32 },
+  { id: "devops", name: "DevOps Basic", tag: "Infra", color: "#F59E0B", accent: "#FCD34D", percent: 42, blurb: "Docker, Kubernetes va CI/CD.", image: devopsImg, details: "Konteynerlash, orchestratsiya, monitoring va observability.", duration: "12 hafta", lessons: 28 },
+  { id: "uiux", name: "UI / UX Design", tag: "Design", color: "#F43F5E", accent: "#FB7185", percent: 30, blurb: "Tadqiqot, prototip, design system.", image: uiuxImg, details: "Foydalanuvchi tadqiqoti, Figma master class va dizayn tizimi.", duration: "6 hafta", lessons: 20 },
+  { id: "py", name: "Python Backend", tag: "Backend", color: "#8B5CF6", accent: "#C4B5FD", percent: 55, blurb: "FastAPI, async, ORM.", image: pythonImg, details: "Data engineering, ML pipelines va high-performance API.", duration: "10 hafta", lessons: 30 },
+  { id: "linux", name: "Linux & Shell", tag: "Sysadmin", color: "#22C55E", accent: "#86EFAC", percent: 60, blurb: "Bash, networking, server hardening.", image: linuxImg, details: "System administration, bash scripting, security va networking.", duration: "8 hafta", lessons: 26 },
 ];
 
 const SPACING = 9;
 
 function lightingIntensity(l: "dim" | "normal" | "bright") {
-  return l === "dim" ? 4 : l === "bright" ? 18 : 10;
+  return l === "dim" ? 6 : l === "bright" ? 22 : 14;
 }
 
-function Alcove({ room, index, onActive }: { room: Room; index: number; onActive: (i: number) => void }) {
-  const groupRef = useRef<THREE.Group>(null!);
+function Alcove({ room, index, onActive, onOpen }: { room: Room; index: number; onActive: (i: number) => void; onOpen: (r: Room) => void }) {
   const lighting = useApp((s) => s.lighting);
   const intensity = lightingIntensity(lighting);
   const x = index * SPACING;
+  const tex = useTexture(room.image);
+  const [hovered, setHovered] = useState(false);
 
-  // Detect when camera is near this alcove
   const { camera } = useThree();
   useFrame(() => {
     const d = Math.abs(camera.position.x - x);
@@ -54,96 +66,95 @@ function Alcove({ room, index, onActive }: { room: Room; index: number; onActive
   const accent = useMemo(() => new THREE.Color(room.accent), [room.accent]);
 
   return (
-    <group ref={groupRef} position={[x, 0, 0]}>
-      {/* Back wall */}
-      <mesh position={[0, 2, -3]} receiveShadow>
-        <planeGeometry args={[7, 6]} />
-        <meshStandardMaterial color="#0a0a1a" roughness={0.9} metalness={0.1} />
+    <group position={[x, 0, 0]}>
+      {/* Side walls */}
+      <mesh position={[-3.6, 2, -1.5]}>
+        <boxGeometry args={[0.1, 6, 3.2]} />
+        <meshStandardMaterial color="#080814" metalness={0.8} roughness={0.3} />
       </mesh>
-      {/* Color glow on back wall */}
-      <mesh position={[0, 2, -2.98]}>
-        <planeGeometry args={[5, 4]} />
-        <meshBasicMaterial color={color} transparent opacity={0.18} />
+      <mesh position={[3.6, 2, -1.5]}>
+        <boxGeometry args={[0.1, 6, 3.2]} />
+        <meshStandardMaterial color="#080814" metalness={0.8} roughness={0.3} />
       </mesh>
 
-      {/* Spot light from above */}
+      {/* Framed AI poster on back wall */}
+      <group position={[0, 2.2, -3]}
+        onPointerOver={(e) => { e.stopPropagation(); setHovered(true); document.body.style.cursor = "pointer"; }}
+        onPointerOut={() => { setHovered(false); document.body.style.cursor = "default"; }}
+        onClick={(e) => { e.stopPropagation(); onOpen(room); }}
+      >
+        {/* Frame */}
+        <mesh position={[0, 0, -0.02]}>
+          <planeGeometry args={[5.2, 4.2]} />
+          <meshStandardMaterial color="#050510" metalness={0.9} roughness={0.2} />
+        </mesh>
+        {/* Image */}
+        <mesh>
+          <planeGeometry args={[5, 4]} />
+          <meshBasicMaterial map={tex} toneMapped={false} />
+        </mesh>
+        {/* Neon trim */}
+        <mesh position={[0, 0, 0.01]}>
+          <planeGeometry args={[5.15, 4.15]} />
+          <meshBasicMaterial color={accent} transparent opacity={hovered ? 0.35 : 0.18} />
+        </mesh>
+      </group>
+
+      {/* Spot from above */}
       <spotLight
-        position={[0, 6, 1]}
-        angle={0.6}
-        penumbra={0.5}
-        intensity={intensity}
+        position={[0, 6, 1.5]}
+        angle={0.65}
+        penumbra={0.55}
+        intensity={hovered ? intensity * 1.6 : intensity}
         color={accent}
         castShadow
-        distance={14}
+        distance={16}
+        target-position={[0, 0, -2]}
       />
-      {/* Rim light */}
-      <pointLight position={[0, 1.5, 2.5]} intensity={intensity * 0.3} color={color} distance={6} />
+      <pointLight position={[0, 1.5, 2.5]} intensity={intensity * 0.25} color={color} distance={6} />
+
+      {/* Particles */}
+      <Sparkles count={28} scale={[5, 4, 3]} position={[0, 2, -1]} size={3} speed={0.4} color={room.accent} />
 
       {/* Floating product (course) card */}
-      <Float speed={1.2} rotationIntensity={0.25} floatIntensity={0.6}>
-        <group position={[0, 1.6, 0]}>
-          <RoundedBox args={[3, 1.9, 0.18]} radius={0.12} smoothness={6} castShadow>
+      <Float speed={1.2} rotationIntensity={0.18} floatIntensity={0.45}>
+        <group position={[0, 0.85, 0.5]}>
+          <RoundedBox
+            args={[3.2, 1.1, 0.16]}
+            radius={0.12}
+            smoothness={6}
+            castShadow
+            onClick={(e) => { e.stopPropagation(); onOpen(room); }}
+            onPointerOver={() => (document.body.style.cursor = "pointer")}
+            onPointerOut={() => (document.body.style.cursor = "default")}
+          >
             <meshPhysicalMaterial
-              color="#15152e"
-              metalness={0.6}
-              roughness={0.25}
+              color="#0e0e22"
+              metalness={0.7}
+              roughness={0.2}
               clearcoat={1}
               clearcoatRoughness={0.1}
               emissive={color}
-              emissiveIntensity={0.18}
+              emissiveIntensity={0.22}
             />
           </RoundedBox>
-          {/* Accent bar */}
-          <mesh position={[0, -0.85, 0.1]}>
-            <boxGeometry args={[2.6, 0.06, 0.02]} />
+          {/* Accent stripe */}
+          <mesh position={[0, -0.48, 0.09]}>
+            <boxGeometry args={[2.9, 0.05, 0.02]} />
             <meshBasicMaterial color={accent} />
           </mesh>
-          <Html
-            transform
-            occlude
-            position={[0, 0, 0.11]}
-            distanceFactor={2.2}
-            style={{ width: 360, pointerEvents: "auto" }}
-          >
-            <div className="rounded-2xl p-4 text-white" style={{ fontFamily: "Inter, sans-serif" }}>
-              <div
-                className="inline-flex rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider"
-                style={{ background: `${room.color}33`, color: room.accent }}
-              >
-                {room.tag}
-              </div>
-              <div className="mt-2 text-2xl font-bold" style={{ fontFamily: "Space Grotesk, sans-serif" }}>
-                {room.name}
-              </div>
-              <div className="mt-1 text-xs text-white/70">{room.blurb}</div>
-              <div className="mt-3 flex items-center gap-3">
-                <div className="flex-1 h-1.5 rounded-full bg-white/10 overflow-hidden">
-                  <div className="h-full rounded-full" style={{ width: `${room.percent}%`, background: `linear-gradient(90deg, ${room.color}, ${room.accent})` }} />
-                </div>
-                <span className="text-xs font-semibold">{room.percent}%</span>
-              </div>
-              <Link
-                to="/learning"
-                className="mt-3 inline-flex w-full items-center justify-center rounded-xl px-4 py-2 text-sm font-semibold shadow-lg transition-transform hover:scale-[1.02]"
-                style={{ background: `linear-gradient(135deg, ${room.color}, ${room.accent})` }}
-              >
-                {room.cta} →
-              </Link>
-            </div>
-          </Html>
+          {/* Progress fill */}
+          <mesh position={[-1.45 + (2.9 * room.percent) / 100 / 2, -0.48, 0.095]}>
+            <boxGeometry args={[(2.9 * room.percent) / 100, 0.08, 0.025]} />
+            <meshBasicMaterial color={color} />
+          </mesh>
         </group>
       </Float>
 
       {/* Pedestal */}
-      <mesh position={[0, 0.1, 0]} castShadow>
-        <cylinderGeometry args={[1.1, 1.3, 0.2, 32]} />
-        <meshStandardMaterial color="#1a1a2e" metalness={0.7} roughness={0.3} />
-      </mesh>
-
-      {/* Side dividers */}
-      <mesh position={[3.5, 2, -2.5]}>
-        <boxGeometry args={[0.05, 6, 1.2]} />
-        <meshStandardMaterial color="#0c0c1f" metalness={0.8} roughness={0.4} />
+      <mesh position={[0, 0.1, 0.5]} castShadow>
+        <cylinderGeometry args={[1.2, 1.4, 0.2, 32]} />
+        <meshStandardMaterial color="#15152a" metalness={0.75} roughness={0.25} />
       </mesh>
     </group>
   );
@@ -151,7 +162,6 @@ function Alcove({ room, index, onActive }: { room: Room; index: number; onActive
 
 function CameraRig({ totalRooms }: { totalRooms: number }) {
   const { camera } = useThree();
-  const containerRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
     camera.position.set(0, 1.8, 5);
@@ -163,7 +173,6 @@ function CameraRig({ totalRooms }: { totalRooms: number }) {
     const totalDistance = (totalRooms - 1) * SPACING;
     const trigger = document.querySelector("[data-scroll-track]") as HTMLElement | null;
     if (!trigger) return;
-    containerRef.current = trigger;
 
     const ctx = gsap.context(() => {
       const obj = { x: 0, look: 0 };
@@ -171,15 +180,11 @@ function CameraRig({ totalRooms }: { totalRooms: number }) {
         x: totalDistance,
         look: totalDistance,
         ease: "none",
-        scrollTrigger: {
-          trigger,
-          start: "top top",
-          end: "bottom bottom",
-          scrub: 1,
-        },
+        scrollTrigger: { trigger, start: "top top", end: "bottom bottom", scrub: 1.2 },
         onUpdate: () => {
           camera.position.x = obj.x;
-          camera.lookAt(obj.look, 1.6, 0);
+          camera.position.y = 1.8 + Math.sin(obj.x * 0.1) * 0.08;
+          camera.lookAt(obj.look, 1.5, 0);
         },
       });
     });
@@ -193,30 +198,99 @@ function CameraRig({ totalRooms }: { totalRooms: number }) {
 function Floor() {
   return (
     <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -1, 0]} receiveShadow>
-      <planeGeometry args={[200, 30]} />
+      <planeGeometry args={[400, 40]} />
       <MeshReflectorMaterial
-        mirror={0.5}
+        mirror={0.55}
         blur={[400, 100]}
         resolution={1024}
         mixBlur={1}
-        mixStrength={4}
-        roughness={0.9}
+        mixStrength={5}
+        roughness={0.85}
         depthScale={1}
         minDepthThreshold={0.85}
-        color="#0a0a14"
-        metalness={0.6}
+        color="#06060f"
+        metalness={0.7}
       />
     </mesh>
   );
 }
 
+function AlcoveModal({ room, onClose }: { room: Room | null; onClose: () => void }) {
+  const navigate = useNavigate();
+  return (
+    <AnimatePresence>
+      {room && (
+        <motion.div
+          initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+          className="fixed inset-0 z-50 grid place-items-center bg-black/70 backdrop-blur-md p-4"
+          onClick={onClose}
+        >
+          <motion.div
+            initial={{ scale: 0.92, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.92, y: 20 }}
+            transition={{ type: "spring", stiffness: 280, damping: 26 }}
+            className="relative w-full max-w-2xl overflow-hidden rounded-3xl bg-card text-card-foreground shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="relative h-56 overflow-hidden">
+              <img src={room.image} alt={room.name} className="h-full w-full object-cover" />
+              <div className="absolute inset-0 bg-gradient-to-t from-card via-card/40 to-transparent" />
+              <button onClick={onClose} className="absolute right-3 top-3 grid h-9 w-9 place-items-center rounded-full bg-black/50 text-white backdrop-blur transition-colors hover:bg-black/70">
+                <X className="h-4 w-4" />
+              </button>
+              <span
+                className="absolute left-4 top-4 rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-white backdrop-blur"
+                style={{ background: `${room.color}AA` }}
+              >
+                {room.tag}
+              </span>
+            </div>
+            <div className="p-6">
+              <h2 className="text-2xl font-bold">{room.name}</h2>
+              <p className="mt-2 text-sm text-muted-foreground">{room.details}</p>
+              <div className="mt-4 grid grid-cols-3 gap-3 text-center">
+                <div className="rounded-xl border border-border p-2.5">
+                  <div className="text-xs text-muted-foreground">Davomiyligi</div>
+                  <div className="mt-0.5 text-sm font-bold">{room.duration}</div>
+                </div>
+                <div className="rounded-xl border border-border p-2.5">
+                  <div className="text-xs text-muted-foreground">Darslar</div>
+                  <div className="mt-0.5 text-sm font-bold">{room.lessons}</div>
+                </div>
+                <div className="rounded-xl border border-border p-2.5">
+                  <div className="text-xs text-muted-foreground">Progress</div>
+                  <div className="mt-0.5 text-sm font-bold">{room.percent}%</div>
+                </div>
+              </div>
+              <div className="mt-4 h-2 overflow-hidden rounded-full bg-muted">
+                <div className="h-full rounded-full" style={{ width: `${room.percent}%`, background: `linear-gradient(90deg, ${room.color}, ${room.accent})` }} />
+              </div>
+              <div className="mt-5 flex gap-2">
+                <button
+                  onClick={() => { onClose(); navigate({ to: "/learning" }); }}
+                  className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-gradient-primary px-4 py-3 text-sm font-semibold text-primary-foreground shadow-glow transition-transform hover:scale-[1.02]"
+                >
+                  Davom etish <ArrowRight className="h-4 w-4" />
+                </button>
+                <button onClick={onClose} className="rounded-xl border border-border bg-card px-4 py-3 text-sm font-semibold hover:bg-accent">
+                  Yopish
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+}
+
 export function GalleryScene() {
   const [activeRoom, setActiveRoom] = useState(0);
+  const [openRoom, setOpenRoom] = useState<Room | null>(null);
   const audioEnabled = useApp((s) => s.audioEnabled);
   const volume = useApp((s) => s.volume);
   const prevRoom = useRef(0);
 
-  // Howler soundscape
+  // Howler ambient — gated by user toggle (autoplay-safe)
   useEffect(() => {
     if (!audioEnabled) return;
     let howl: any = null;
@@ -224,7 +298,6 @@ export function GalleryScene() {
     import("howler").then(({ Howl }) => {
       if (cancelled) return;
       howl = new Howl({
-        // Ambient pad — public CC0 hosted asset
         src: ["https://cdn.pixabay.com/audio/2022/03/15/audio_4f8de7e9e7.mp3"],
         loop: true,
         volume,
@@ -234,10 +307,16 @@ export function GalleryScene() {
     });
     return () => {
       cancelled = true;
-      if (howl) howl.fade(volume, 0, 600);
-      setTimeout(() => howl?.stop(), 700);
+      if (howl) { try { howl.fade(volume, 0, 500); } catch {} }
+      setTimeout(() => { try { howl?.stop(); } catch {} }, 600);
     };
-  }, [audioEnabled, volume]);
+  }, [audioEnabled]);
+
+  // Volume live update — keep separate so changing volume doesn't restart playback
+  useEffect(() => {
+    if (!audioEnabled) return;
+    import("howler").then(({ Howler }) => { Howler.volume(volume); });
+  }, [volume, audioEnabled]);
 
   // Transition SFX
   useEffect(() => {
@@ -265,18 +344,19 @@ export function GalleryScene() {
           gl={{ antialias: true, alpha: false }}
           style={{ background: "radial-gradient(ellipse at center, #0d0d24 0%, #050510 70%)" }}
         >
-          <fog attach="fog" args={["#050510", 8, 28]} />
-          <ambientLight intensity={0.18} />
-          <Environment preset="night" />
-          {ROOMS.map((r, i) => (
-            <Alcove key={r.id} room={r} index={i} onActive={setActiveRoom} />
-          ))}
-          <Floor />
+          <fog attach="fog" args={["#050510", 9, 32]} />
+          <ambientLight intensity={0.22} />
+          <Suspense fallback={null}>
+            <Environment preset="night" />
+            {ROOMS.map((r, i) => (
+              <Alcove key={r.id} room={r} index={i} onActive={setActiveRoom} onOpen={setOpenRoom} />
+            ))}
+            <Floor />
+          </Suspense>
           <CameraRig totalRooms={ROOMS.length} />
         </Canvas>
       </div>
 
-      {/* Scroll track to drive ScrollTrigger */}
       <div data-scroll-track style={{ height: `${ROOMS.length * 100}vh` }} />
 
       {/* Room indicator */}
@@ -304,11 +384,25 @@ export function GalleryScene() {
       {/* Current room badge top right */}
       <div className="pointer-events-none fixed right-6 top-24 z-30 hidden md:block">
         <div className="glass-2 rounded-2xl px-4 py-3">
-          <div className="text-[10px] uppercase tracking-widest text-white/50">Hozir</div>
+          <div className="flex items-center gap-1.5 text-[10px] uppercase tracking-widest text-white/50">
+            <SparkIcon className="h-3 w-3" /> Hozir
+          </div>
           <div className="mt-0.5 text-lg font-bold text-white">{ROOMS[activeRoom].name}</div>
           <div className="text-xs" style={{ color: ROOMS[activeRoom].accent }}>{ROOMS[activeRoom].tag}</div>
         </div>
       </div>
+
+      {/* Open button bottom center */}
+      <div className="pointer-events-auto fixed bottom-24 left-1/2 z-30 -translate-x-1/2 lg:bottom-8">
+        <button
+          onClick={() => setOpenRoom(ROOMS[activeRoom])}
+          className="rounded-full bg-gradient-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground shadow-glow transition-transform hover:scale-105"
+        >
+          {ROOMS[activeRoom].name} ni ochish
+        </button>
+      </div>
+
+      <AlcoveModal room={openRoom} onClose={() => setOpenRoom(null)} />
     </>
   );
 }
