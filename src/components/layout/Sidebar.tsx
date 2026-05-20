@@ -26,7 +26,7 @@ const nav = [
   { to: "/gallery", label: "3D Galereya", icon: Boxes, badge: "NEW" },
   { to: "/grades", label: "Davomat va Baholar", icon: BarChart3 },
   { to: "/finance", label: "Moliya va To'lovlar", icon: Wallet },
-  { to: "/support", label: "Qo'llab-quvvatlash", icon: Headphones },
+  { to: "/support", label: "Qo'llab-quvvatlash", icon: Headphones, subtitle: "Node.js & API" },
   { to: "/settings", label: "Sozlamalar", icon: Settings },
 ] as const;
 
@@ -63,18 +63,24 @@ export function Sidebar({ onNavigate, forceExpanded }: { onNavigate?: () => void
   return (
     <aside
       className={cn(
-        "relative flex h-full flex-col border-r border-sidebar-border bg-sidebar text-sidebar-foreground transition-[width] duration-300 noise-overlay",
+        "relative flex h-full flex-col border-r border-sidebar-border bg-sidebar text-sidebar-foreground transition-[width] duration-300 noise-overlay overflow-hidden",
         collapsed ? "w-[78px]" : "w-[260px]"
       )}
     >
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-primary/10 to-transparent" />
+      {/* Animated gradient glow */}
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-48 bg-gradient-to-b from-cyan-500/8 via-blue-500/5 to-transparent" />
+      <div className="pointer-events-none absolute -right-20 top-20 h-40 w-40 rounded-full bg-cyan-500/10 blur-3xl animate-pulse-glow" />
 
       <div className="relative flex items-center gap-2.5 px-4 py-5">
         <Link to="/" onClick={onNavigate} className="flex items-center gap-2.5">
-          <div className="relative grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-gradient-primary shadow-glow">
-            <GraduationCap className="h-5 w-5 text-primary-foreground" />
-            <div className="absolute -inset-px rounded-xl bg-gradient-primary opacity-50 blur-md" />
-          </div>
+          <motion.div 
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="relative grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-cyan-500 to-blue-500 shadow-glow-cyan"
+          >
+            <GraduationCap className="h-5 w-5 text-white" />
+            <div className="absolute -inset-px rounded-xl bg-gradient-to-br from-cyan-500 to-blue-500 opacity-50 blur-md" />
+          </motion.div>
           {!collapsed && (
             <div className="overflow-hidden">
               <div className="text-base font-bold tracking-tight">EduPro</div>
@@ -114,13 +120,13 @@ export function Sidebar({ onNavigate, forceExpanded }: { onNavigate?: () => void
                 />
                 <defs>
                   <linearGradient id="xpGrad" x1="0" y1="0" x2="1" y2="1">
-                    <stop offset="0%" stopColor="oklch(0.62 0.22 280)" />
-                    <stop offset="100%" stopColor="oklch(0.72 0.2 305)" />
+                    <stop offset="0%" stopColor="oklch(0.7 0.15 195)" />
+                    <stop offset="100%" stopColor="oklch(0.65 0.18 220)" />
                   </linearGradient>
                 </defs>
               </svg>
               <img src={profile.avatar} alt={profile.name} className="relative h-11 w-11 rounded-full ring-2 ring-background" />
-              <div className="absolute -bottom-1 -right-1 grid h-5 w-5 place-items-center rounded-full bg-gradient-primary text-[9px] font-bold text-primary-foreground ring-2 ring-sidebar">
+              <div className="absolute -bottom-1 -right-1 grid h-5 w-5 place-items-center rounded-full bg-gradient-to-br from-cyan-500 to-blue-500 text-[9px] font-bold text-white ring-2 ring-sidebar">
                 {profile.level}
               </div>
             </div>
@@ -151,20 +157,27 @@ export function Sidebar({ onNavigate, forceExpanded }: { onNavigate?: () => void
                 "group relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all",
                 collapsed && "justify-center px-2",
                 active
-                  ? "bg-gradient-primary text-primary-foreground shadow-glow"
+                  ? "bg-gradient-to-r from-cyan-500/20 to-blue-500/20 text-cyan-300 shadow-lg shadow-cyan-500/10"
                   : "text-sidebar-foreground/75 hover:bg-sidebar-accent hover:text-sidebar-foreground"
               )}
             >
               {active && !collapsed && (
                 <motion.span
                   layoutId="active-rail"
-                  className="absolute -left-3 top-1/2 h-7 w-1 -translate-y-1/2 rounded-r-full bg-primary-glow shadow-glow"
+                  className="absolute -left-3 top-1/2 h-7 w-1 -translate-y-1/2 rounded-r-full bg-gradient-to-b from-cyan-400 to-blue-500 shadow-glow-cyan"
                 />
               )}
               <Icon className="h-[18px] w-[18px] shrink-0" />
-              {!collapsed && <span className="truncate">{item.label}</span>}
+              {!collapsed && (
+                <div className="flex min-w-0 flex-1 flex-col">
+                  <span className="truncate">{item.label}</span>
+                  {"subtitle" in item && item.subtitle && (
+                    <span className="truncate text-[10px] text-muted-foreground">{item.subtitle}</span>
+                  )}
+                </div>
+              )}
               {!collapsed && "badge" in item && item.badge && (
-                <span className="ml-auto rounded-md bg-gradient-rose px-1.5 py-0.5 text-[9px] font-bold text-white">
+                <span className="ml-auto shrink-0 rounded-md bg-gradient-rose px-1.5 py-0.5 text-[9px] font-bold text-white">
                   {item.badge}
                 </span>
               )}
@@ -203,7 +216,7 @@ export function Sidebar({ onNavigate, forceExpanded }: { onNavigate?: () => void
           </div>
           <div className="mt-2 text-sm font-semibold">3 / 4 dars yakunlandi</div>
           <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-muted">
-            <div className="h-full w-[75%] rounded-full bg-gradient-primary" />
+            <div className="h-full w-[75%] rounded-full bg-gradient-to-r from-cyan-500 to-blue-500" />
           </div>
           <div className="mt-1.5 text-[11px] text-muted-foreground">+45 XP qoldi</div>
         </div>
@@ -230,18 +243,18 @@ function FilterGroup<T extends string>({
   label, value, onChange, opts,
 }: { label: string; value: T; onChange: (v: T) => void; opts: readonly { v: T; l: string }[] }) {
   return (
-    <div className="mt-3">
-      <div className="mb-1.5 text-[10px] font-medium text-muted-foreground">{label}</div>
-      <div className="flex flex-wrap gap-1">
+    <div className="mt-3 space-y-2">
+      <div className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">{label}</div>
+      <div className="flex flex-wrap gap-1.5">
         {opts.map((o) => (
           <button
             key={o.v}
             onClick={() => onChange(o.v)}
             className={cn(
-              "rounded-md px-2 py-1 text-[10px] font-semibold transition-colors",
+              "rounded-lg px-2.5 py-1.5 text-[10px] font-semibold transition-all duration-200",
               value === o.v
-                ? "bg-primary text-primary-foreground"
-                : "bg-muted/60 text-muted-foreground hover:bg-muted"
+                ? "bg-gradient-primary text-primary-foreground shadow-glow"
+                : "bg-sidebar-accent/50 text-muted-foreground hover:bg-sidebar-accent hover:text-foreground"
             )}
           >
             {o.l}

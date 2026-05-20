@@ -48,9 +48,9 @@ function GalleryPage() {
 
           {/* Hero overlay on first room */}
           <div className="pointer-events-none fixed inset-x-0 top-24 z-20 mx-auto max-w-2xl px-6 text-center md:top-32">
-            <div className="text-[11px] uppercase tracking-[0.3em] text-white/40">EduPro · v2</div>
+            <div className="text-[11px] uppercase tracking-[0.3em] text-white/40">EduPro · v4</div>
             <h1 className="mt-2 text-3xl font-bold text-white drop-shadow-lg md:text-5xl">
-              Har bir kurs — <span className="text-gradient-primary">o'z xonasi</span>
+              Har bir kurs — <span className="text-gradient-cyan">o'z xonasi</span>
             </h1>
             <p className="mx-auto mt-2 max-w-md text-sm text-white/60 md:text-base">
               Aylanuvchi spotlightlar va atmosfera bilan to'la 3D galereya. Pastga aylantiring.

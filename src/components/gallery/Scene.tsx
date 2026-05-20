@@ -9,9 +9,9 @@ import { useNavigate } from "@tanstack/react-router";
 import { motion, AnimatePresence } from "framer-motion";
 import { Sparkles as SparkIcon, X, ArrowRight } from "lucide-react";
 
-import reactImg from "@/assets/gallery/react.jpg";
-import nodeImg from "@/assets/gallery/node.jpg";
-import devopsImg from "@/assets/gallery/devops.jpg";
+import reactImg from "@/assets/gallery/react-cover.jpg";
+import nodeImg from "@/assets/gallery/node-cover.jpg";
+import devopsImg from "@/assets/gallery/devops-cover.jpg";
 import uiuxImg from "@/assets/gallery/uiux.jpg";
 import pythonImg from "@/assets/gallery/python.jpg";
 import linuxImg from "@/assets/gallery/linux.jpg";
@@ -38,9 +38,9 @@ const ROOMS: Room[] = [
   { id: "react", name: "React Advanced", tag: "Frontend", color: "#22D3EE", accent: "#67E8F9", percent: 68, blurb: "Hooks, Suspense, Server Components.", image: reactImg, details: "Zamonaviy React arxitekturasi, performance optimizatsiya va testing.", duration: "8 hafta", lessons: 24 },
   { id: "node", name: "Node.js & API", tag: "Backend", color: "#10B981", accent: "#34D399", percent: 45, blurb: "Express, REST va gRPC servislari.", image: nodeImg, details: "Production-ready API qurish, autentifikatsiya, microservices.", duration: "10 hafta", lessons: 32 },
   { id: "devops", name: "DevOps Basic", tag: "Infra", color: "#F59E0B", accent: "#FCD34D", percent: 42, blurb: "Docker, Kubernetes va CI/CD.", image: devopsImg, details: "Konteynerlash, orchestratsiya, monitoring va observability.", duration: "12 hafta", lessons: 28 },
-  { id: "uiux", name: "UI / UX Design", tag: "Design", color: "#F43F5E", accent: "#FB7185", percent: 30, blurb: "Tadqiqot, prototip, design system.", image: uiuxImg, details: "Foydalanuvchi tadqiqoti, Figma master class va dizayn tizimi.", duration: "6 hafta", lessons: 20 },
-  { id: "py", name: "Python Backend", tag: "Backend", color: "#8B5CF6", accent: "#C4B5FD", percent: 55, blurb: "FastAPI, async, ORM.", image: pythonImg, details: "Data engineering, ML pipelines va high-performance API.", duration: "10 hafta", lessons: 30 },
-  { id: "linux", name: "Linux & Shell", tag: "Sysadmin", color: "#22C55E", accent: "#86EFAC", percent: 60, blurb: "Bash, networking, server hardening.", image: linuxImg, details: "System administration, bash scripting, security va networking.", duration: "8 hafta", lessons: 26 },
+  { id: "uiux", name: "UI / UX Design", tag: "Design", color: "#06B6D4", accent: "#22D3EE", percent: 30, blurb: "Tadqiqot, prototip, design system.", image: uiuxImg, details: "Foydalanuvchi tadqiqoti, Figma master class va dizayn tizimi.", duration: "6 hafta", lessons: 20 },
+  { id: "py", name: "Python Backend", tag: "Backend", color: "#0EA5E9", accent: "#38BDF8", percent: 55, blurb: "FastAPI, async, ORM.", image: pythonImg, details: "Data engineering, ML pipelines va high-performance API.", duration: "10 hafta", lessons: 30 },
+  { id: "linux", name: "Linux & Shell", tag: "Sysadmin", color: "#14B8A6", accent: "#5EEAD4", percent: 60, blurb: "Bash, networking, server hardening.", image: linuxImg, details: "System administration, bash scripting, security va networking.", duration: "8 hafta", lessons: 26 },
 ];
 
 const SPACING = 9;
@@ -267,7 +267,7 @@ function AlcoveModal({ room, onClose }: { room: Room | null; onClose: () => void
               <div className="mt-5 flex gap-2">
                 <button
                   onClick={() => { onClose(); navigate({ to: "/learning" }); }}
-                  className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-gradient-primary px-4 py-3 text-sm font-semibold text-primary-foreground shadow-glow transition-transform hover:scale-[1.02]"
+                  className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-500 px-4 py-3 text-sm font-semibold text-white shadow-glow-cyan transition-transform hover:scale-[1.02]"
                 >
                   Davom etish <ArrowRight className="h-4 w-4" />
                 </button>
@@ -396,7 +396,7 @@ export function GalleryScene() {
       <div className="pointer-events-auto fixed bottom-24 left-1/2 z-30 -translate-x-1/2 lg:bottom-8">
         <button
           onClick={() => setOpenRoom(ROOMS[activeRoom])}
-          className="rounded-full bg-gradient-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground shadow-glow transition-transform hover:scale-105"
+          className="rounded-full bg-gradient-to-r from-cyan-500 to-blue-500 px-5 py-2.5 text-sm font-semibold text-white shadow-glow-cyan transition-transform hover:scale-105"
         >
           {ROOMS[activeRoom].name} ni ochish
         </button>

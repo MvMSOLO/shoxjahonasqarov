@@ -7,9 +7,14 @@ import {
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
+import { lazy, Suspense } from "react";
 
 import appCss from "../styles.css?url";
 import { Toaster } from "@/components/ui/sonner";
+
+const ParticleAtmosphere = lazy(() => 
+  import("@/components/three/ParticleAtmosphere").then(m => ({ default: m.ParticleAtmosphere }))
+);
 
 function NotFoundComponent() {
   return (
@@ -124,6 +129,9 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
+      <Suspense fallback={null}>
+        <ParticleAtmosphere />
+      </Suspense>
       <Outlet />
       <Toaster richColors position="top-right" />
     </QueryClientProvider>
