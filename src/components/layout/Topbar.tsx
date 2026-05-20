@@ -1,6 +1,6 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { Bell, Search, Sun, Moon, Menu, Check, Volume2, VolumeX, ArrowRight, User, Settings as SettingsIcon, LogOut } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useApp } from "@/lib/store";
 import { profile, courses, schedule } from "@/lib/mock-data";
@@ -26,8 +26,16 @@ export function Topbar() {
   const [searchOpen, setSearchOpen] = useState(false);
   const [sheetOpen, setSheetOpen] = useState(false);
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const navigate = useNavigate();
   const unread = notifications.filter((n) => !n.read).length;
+
+  // Track scroll for navbar styling
+  useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 20);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   const allItems: SearchResult[] = useMemo(() => {
     const courseItems = courses.map((c) => ({ label: c.name, to: "/learning", kind: "Kurs" }));
@@ -62,7 +70,16 @@ export function Topbar() {
   }
 
   return (
-    <header className="sticky top-0 z-30 flex items-center gap-2 border-b border-border bg-background/75 px-3 py-3 backdrop-blur-xl md:gap-3 md:px-6 md:py-4">
+    <motion.header 
+      initial={{ y: -20, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      transition={{ duration: 0.5, ease: [0.23, 1, 0.32, 1] }}
+      className={`sticky top-0 z-30 flex items-center gap-2 border-b px-3 py-3 backdrop-blur-2xl transition-all duration-500 md:gap-3 md:px-6 md:py-4 ${
+        scrolled 
+          ? "border-border/50 bg-background/80 shadow-lg shadow-black/10" 
+          : "border-transparent bg-transparent"
+      }`}
+    >
       <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
         <SheetTrigger asChild>
           <button className="grid h-10 w-10 place-items-center rounded-xl border border-border bg-card lg:hidden" aria-label="Menyu">
@@ -258,6 +275,6 @@ export function Topbar() {
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
-    </header>
+    </motion.header>
   );
 }
