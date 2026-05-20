@@ -9,11 +9,12 @@ import {
   Headphones,
   Settings,
   Flame,
-  Crown,
   LogOut,
   Boxes,
   ChevronsLeft,
   ChevronsRight,
+  Filter,
+  RotateCcw,
 } from "lucide-react";
 import { useApp } from "@/lib/store";
 import { profile } from "@/lib/mock-data";
@@ -29,11 +30,31 @@ const nav = [
   { to: "/settings", label: "Sozlamalar", icon: Settings },
 ] as const;
 
+const levelOpts = [
+  { v: "all", l: "Hammasi" },
+  { v: "beginner", l: "Boshlang'ich" },
+  { v: "mid", l: "O'rta" },
+  { v: "advanced", l: "Yuqori" },
+] as const;
+const statusOpts = [
+  { v: "all", l: "Hammasi" },
+  { v: "active", l: "Faol" },
+  { v: "done", l: "Tugagan" },
+] as const;
+const sortOpts = [
+  { v: "new", l: "Yangi" },
+  { v: "old", l: "Eski" },
+  { v: "rating", l: "Reyting" },
+] as const;
+
 export function Sidebar({ onNavigate, forceExpanded }: { onNavigate?: () => void; forceExpanded?: boolean }) {
   const path = useRouterState({ select: (s) => s.location.pathname });
   const logout = useApp((s) => s.logout);
   const collapsedState = useApp((s) => s.sidebarCollapsed);
   const toggleSidebar = useApp((s) => s.toggleSidebar);
+  const filters = useApp((s) => s.filters);
+  const setFilters = useApp((s) => s.setFilters);
+  const resetFilters = useApp((s) => s.resetFilters);
   const collapsed = forceExpanded ? false : collapsedState;
 
   const xpPct = (profile.xp / profile.xpMax) * 100;
@@ -46,7 +67,6 @@ export function Sidebar({ onNavigate, forceExpanded }: { onNavigate?: () => void
         collapsed ? "w-[78px]" : "w-[260px]"
       )}
     >
-      {/* Glow accent */}
       <div className="pointer-events-none absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-primary/10 to-transparent" />
 
       <div className="relative flex items-center gap-2.5 px-4 py-5">
@@ -59,7 +79,7 @@ export function Sidebar({ onNavigate, forceExpanded }: { onNavigate?: () => void
             <div className="overflow-hidden">
               <div className="text-base font-bold tracking-tight">EduPro</div>
               <div className="-mt-0.5 text-[10px] uppercase tracking-widest text-muted-foreground">
-                Student v2
+                Student v3
               </div>
             </div>
           )}
@@ -117,7 +137,7 @@ export function Sidebar({ onNavigate, forceExpanded }: { onNavigate?: () => void
         </div>
       </div>
 
-      <nav className={cn("relative flex flex-1 flex-col gap-1 overflow-y-auto px-3 py-4 scrollbar-thin", collapsed && "px-2")}>
+      <nav className={cn("relative flex flex-col gap-1 overflow-y-auto px-3 py-4 scrollbar-thin", collapsed && "px-2")}>
         {nav.map((item) => {
           const active = path === item.to;
           const Icon = item.icon;
@@ -153,6 +173,23 @@ export function Sidebar({ onNavigate, forceExpanded }: { onNavigate?: () => void
         })}
       </nav>
 
+      {/* Filters */}
+      {!collapsed && (
+        <div className="relative mx-3 mb-3 rounded-2xl border border-sidebar-border bg-card/40 p-3.5">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+              <Filter className="h-3 w-3" /> Filtrlar
+            </div>
+            <button onClick={resetFilters} className="text-muted-foreground transition-colors hover:text-foreground" aria-label="Reset">
+              <RotateCcw className="h-3 w-3" />
+            </button>
+          </div>
+          <FilterGroup label="Daraja" value={filters.level} onChange={(v) => setFilters({ level: v as Filters["level"] })} opts={levelOpts} />
+          <FilterGroup label="Holat" value={filters.status} onChange={(v) => setFilters({ status: v as Filters["status"] })} opts={statusOpts} />
+          <FilterGroup label="Saralash" value={filters.sort} onChange={(v) => setFilters({ sort: v as Filters["sort"] })} opts={sortOpts} />
+        </div>
+      )}
+
       {/* Daily goal widget */}
       {!collapsed && (
         <div className="relative mx-3 mb-3 rounded-2xl border border-sidebar-border bg-gradient-card p-3.5">
@@ -172,23 +209,6 @@ export function Sidebar({ onNavigate, forceExpanded }: { onNavigate?: () => void
         </div>
       )}
 
-      {/* Upgrade CTA */}
-      {!collapsed && (
-        <div className="relative mx-3 mb-3 overflow-hidden rounded-2xl bg-gradient-primary p-3.5 text-primary-foreground shadow-glow">
-          <div className="absolute -right-4 -top-4 h-16 w-16 rounded-full bg-white/20 blur-2xl" />
-          <div className="relative flex items-center gap-2">
-            <Crown className="h-4 w-4" />
-            <div className="text-xs font-bold uppercase tracking-wide">Pro ga o'tish</div>
-          </div>
-          <div className="relative mt-1 text-[11px] text-primary-foreground/85">
-            Eksklyuziv mentorlik va materiallar
-          </div>
-          <button className="relative mt-2 w-full rounded-lg bg-white/15 px-3 py-1.5 text-[11px] font-semibold backdrop-blur transition-colors hover:bg-white/25">
-            Yangilash
-          </button>
-        </div>
-      )}
-
       <button
         onClick={() => { logout(); onNavigate?.(); }}
         title={collapsed ? "Chiqish" : undefined}
@@ -201,5 +221,33 @@ export function Sidebar({ onNavigate, forceExpanded }: { onNavigate?: () => void
         {!collapsed && "Chiqish"}
       </button>
     </aside>
+  );
+}
+
+type Filters = ReturnType<typeof useApp.getState>["filters"];
+
+function FilterGroup<T extends string>({
+  label, value, onChange, opts,
+}: { label: string; value: T; onChange: (v: T) => void; opts: readonly { v: T; l: string }[] }) {
+  return (
+    <div className="mt-3">
+      <div className="mb-1.5 text-[10px] font-medium text-muted-foreground">{label}</div>
+      <div className="flex flex-wrap gap-1">
+        {opts.map((o) => (
+          <button
+            key={o.v}
+            onClick={() => onChange(o.v)}
+            className={cn(
+              "rounded-md px-2 py-1 text-[10px] font-semibold transition-colors",
+              value === o.v
+                ? "bg-primary text-primary-foreground"
+                : "bg-muted/60 text-muted-foreground hover:bg-muted"
+            )}
+          >
+            {o.l}
+          </button>
+        ))}
+      </div>
+    </div>
   );
 }

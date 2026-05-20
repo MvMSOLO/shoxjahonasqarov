@@ -1,114 +1,134 @@
-# EduPro v2 — Immersive 3D Gallery Upgrade
+# EduPro v3 — Big Update
 
-Bugungi katta yangilanish: hozirgi student dashboard ustiga "3D gallery where each room showcases one product" konsepsiyasini moslab, har bir kurs/modul alohida 3D alcove sifatida ko'rinadigan immersive tajriba qo'shamiz. Barcha tugmalar ishlaydi, mobile-da native app hissi, sidebar polished.
+Bugungi maqsad: v2 dagi xatoliklarni tuzatish, 3D galereyani professional darajaga olib chiqish, har bir tugna/sahifani real ishlaydigan qilish.
 
-## 1) Yangi `/gallery` route — 3D Immersive Hall
+## 1) Bug fix — search overlay sidebarga otib ketadi
 
-Hozirgi `/learning` sahifasiga qo'shimcha sifatida `/gallery` qo'shamiz va sidebardan "3D Galereya" havolasi bilan ulaymiz. Asosiy dashboard buzilmaydi.
+Mobile/tablet'da Topbar search natijalari dropdown'i z-index/positioning sabab sidebar (drawer) ustiga emas, balki orqasiga/yon tomonga chiqayapti. Yechim:
+- Search dropdown `position: absolute` + `z-50` o'rniga `Popover` (Radix) ichiga olinadi — portal qiladi va overflow muammosi yo'q.
+- Dropdown maksimal `calc(100vw - 32px)` width, mobile'da topbar tagiga full-width sheet sifatida ochiladi.
+- Sidebar drawer ochilganda search yopiladi.
 
-Har bir kurs (React, Node.js, DevOps, UI/UX, Python, Linux) — alohida **alcove** (devordagi nisha):
-- O'z lighting setup'i (spot + rim + ambient gradient)
-- O'z atmosfera rangi (indigo/emerald/amber/rose/cyan/violet)
-- Markazda floating 3D card: kurs nomi, progress, "Davom etish" CTA
-- Reflective floor + soft fog
+## 2) 3D Galereya — professional upgrade
 
-Tech:
-- `three` + `@react-three/fiber` + `@react-three/drei` (Html, Environment, MeshReflectorMaterial, SpotLight, Text3D, ContactShadows)
-- Har bir alcove — alohida `<group>` (WebGL ichida bitta scene, lekin har biri "individual" lighting va material)
-- Background: dark void + volumetric god-rays
+Hozirgi Scene oddiy floating cardlar. Yangi versiya:
 
-## 2) GSAP ScrollTrigger camera path
+**Vizual:**
+- Har kurs uchun AI-generated atmosfera rasm (nano-banana premium orqali) — 6 ta: React (cyan neon lab), Node.js (emerald server room), DevOps (amber industrial), UI/UX (rose studio), Python (violet cosmic), Linux (terminal green matrix). Har biri 1280x1280, alcove orqa devoriga texture sifatida.
+- Har alcove'da: backlit framed poster (AI image) + 3D floating product card (kurs ma'lumoti) + neon trim + reflective floor + volumetric god-ray.
+- Environment HDRI (drei `Environment preset="city"`) + ContactShadows.
+- Particles (drei `Sparkles`) har alcove rangida.
 
-- `gsap` + `gsap/ScrollTrigger`
-- Sahifa balandligi ~600vh, scroll qilganda kamera spline path bo'ylab bir alcove'dan ikkinchisiga uchadi
-- Har bir alcove'da kamera 1.5s "to'xtaydi" (snap), info HTML overlay fade-in
-- Progress indicator (chap tomonda vertical dots — qaysi room'dasiz)
-- Pastda "Scroll to explore" hint, keyin yo'qoladi
-- Reduced-motion: scroll path o'rniga oddiy grid fallback
+**Interaksiya:**
+- GSAP ScrollTrigger camera path silliqlangan — har xona oldida 1.5s snap + DOF blur (postprocessing `Bokeh`).
+- Click on alcove → modal: kurs tafsilotlari, "Davom etish" → `/learning` ga navigate (kurs id bilan).
+- Hover'da alcove yorug'lik intensivligi oshadi.
+- Mouse parallax (kichik kamera tilt).
 
-## 3) Howler.js soundscape
+**Performance:**
+- Images `lazy` + `Suspense` fallback.
+- Mobile: faqat 3 alcove, postprocessing off, DPR clamp `[1, 1.5]`.
+- Reduced-motion: scroll snap o'chadi, statik grid.
 
-- `howler`
-- 3 ta ambient loop (lo-fi pad, deep hum, soft chime) — kategoriyaga qarab cross-fade
-- Har bir room transition'da subtle "whoosh" SFX
-- Topbar'da yangi 🔊 toggle (default: off, localStorage'da saqlanadi — auto-play policy)
-- Volume slider dropdown'da
+**Yangi fayllar:**
+- `src/assets/gallery/{react,node,devops,uiux,python,linux}.jpg` (nano-banana orqali generatsiya)
+- `src/components/gallery/Alcove.tsx` (alohida room komponent)
+- `src/components/gallery/AlcoveModal.tsx`
+- `src/components/gallery/useScrollCamera.ts` (GSAP rig)
+- `src/components/gallery/Scene.tsx` (qayta yoziladi)
 
-Manbalar: CDN'dan CC0 ambient (`pixabay`/`freesound` direct URL'lar) yoki kichik base64 — sahifa og'irlashmasligi uchun lazy load.
+## 3) Hamma tugmalar real ishlaydi + filtrlar
 
-## 4) Hamma tugmalar ishlaydi (audit + fix)
+**Topbar:**
+- Avatar dropdown: Profil → `/settings#profile`, Sozlamalar → `/settings`, Chiqish → logout + redirect.
+- Audio (Howler) — `useSoundscape` hook tuzatiladi: user gesture'dan keyin `Howl.play()` (browser autoplay policy), volume slider real ishlaydi, localStorage'da saqlanadi, toggle ikona holatga qarab.
+- Bell dropdown: "Hammasini o'qilgan", individual click ham o'qiydi.
+- Search → Popover (yuqorida).
 
-Hozir ba'zi joylar dekorativ. Quyidagilarni real qilamiz:
+**Sidebar:**
+- "Pro ga o'tish" CTA bloki **olib tashlanadi**.
+- O'rniga **Filtrlar** paneli: Kurs darajasi (Boshlang'ich/O'rta/Yuqori), Status (Faol/Tugallangan), Sort (Yangi/Eski/Reyting) — Zustand `filters` slice, dashboard/learning/gallery'ga ta'sir qiladi.
+- "Kunlik maqsad" qoladi.
 
-- **Sidebar profile dropdown** → `/settings` ga navigate
-- **Topbar avatar menyu**: Profil → `/settings`, Sozlamalar → `/settings`, Chiqish → logout + `/login` redirect
-- **Lighting toggle**: yangi tugma — gallery sahifasidagi spot intensiyasini cycle qiladi (Dim / Normal / Bright)
-- **Dark/Light mode toggle**: tekshirish — gallery'da ham theme'ga reaksiya (light mode'da bg, fog, material'lar moslashadi)
-- **"Davom etish" / "Darsga qo'shilish"**: allaqachon modal — qoldiramiz
-- **Bell**: mark-as-read ishlaydi — tekshirish
-- **Search**: hozirgi state-only. Real natija dropdown qo'shamiz (kurslar/vazifalar bo'yicha filter, click → navigate)
-- **Settings sahifasi**: theme'dan tashqari — notification toggles, til, audio volume, animation level (real state, persisted)
+**Settings sahifasi:**
+- Tab'lar: Profil / Tashqi ko'rinish / Audio / Bildirishnomalar / Til.
+- Profil: ism/email/avatar yuklash (FileReader → store).
+- Audio: Master volume, ambient on/off, SFX on/off (real Howler bog'lash).
+- Bildirishnomalar: real toggle (store).
+- Til: UZ/EN (i18n stub — string map).
 
-## 5) Mobile = native app
+## 4) Davomat va Baholar — real sahifa
 
-<768px da to'liq qayta dizayn:
+Hozir `SimplePage` placeholder. To'liq quramiz:
 
-- **Sidebar yashiriladi**, o'rniga **bottom tab bar** (fixed, safe-area aware):
-  - 5 ta tab: Bosh, O'quv, 3D, Moliya, Profil
-  - Active tab — gradient pill + scale animation
-  - O'rtadagi "3D" tab — kattaroq, floating "+"-style FAB hissi
-- **Topbar** kompaktlashadi: faqat greeting + bell + avatar (search → pastga, sticky search bar yoki sheet)
-- **Stat cards**: horizontal snap-scroll carousel (1.2 card visible)
-- **Schedule/Courses**: vertical stack, swipeable
-- **Right rail kartochkalari** (NextLesson, Todo, Balance): asosiy oqimga aralashtiriladi
-- Safe-area insets (`env(safe-area-inset-bottom)`)
-- Tap targets ≥44px, haptic-feel transitions
+**`/grades`:**
+- Tabs: Baholar / Davomat / Sertifikatlar.
+- Baholar jadvali (Tanstack Table): kurs, vazifa, ball, maks ball, sana, status — filter + sort + search.
+- Davomat: oyma-oy heatmap (har kun rang intensivligi), oylik %, "yo'qlama qilingan" / "kelmagan" / "kechikkan" qator-qator.
+- Sertifikatlar grid (mock 3 ta) — "Yuklab olish" → toast.
+- SkillsRadar yuqorida summary sifatida qoladi.
 
-## 6) Sidebar redesign (desktop)
+**`/learning`:**
+- Kurslar grid + filtrlar (Sidebar filters bilan bog'lanadi).
+- Har kurs cardida: progress bar, "Davom etish" → modal.
+- "Vazifalarim" tab — to'liq todo list (TodoCard kengaytirilgan).
 
-- Glassmorphism qatlami chuqurroq, subtle noise texture
-- Logo lockup'i yaxshilanadi (gradient mark + wordmark balansi)
-- Profil bloki — XP ring (donut) avatar atrofida, level badge floating
-- Nav item'lar: icon container + label, hover'da gradient sweep, active'da chap chetda gradient bar + glow
-- "Streak" card o'rniga ixcham "Daily goal" widget (mini progress + flame)
-- Collapse tugmasi (≥lg) — icon-only 72px rejim, tooltip bilan
-- Pastda mini "Upgrade to Pro" CTA (gradient, optional dismiss)
+## 5) UI/UX polish + QA audit
 
-## Texnik qo'shimchalar
+- Spacing, ritm, hierarchy butun saytda ko'rib chiqiladi.
+- Typography scale aniqlashtiriladi (display/headline/body/caption tokenlar).
+- Dark/Light mode contrast WCAG AA.
+- Focus rings barcha interactive elementlarda.
+- Tap target ≥44px mobile.
+- Har sahifa va tugmani manual audit:
+  - `/`, `/learning`, `/gallery`, `/grades`, `/finance`, `/support`, `/settings`
+  - Har modal ochilishi/yopilishi
+  - Theme toggle, audio toggle, lighting cycle
+  - Mobile BottomNav 5 tab
+- Console warninglarni 0 ga tushirish.
 
-Paketlar:
+## 6) Texnik qo'shimchalar
+
+Paketlar (agar yo'q bo'lsa):
 ```
-bun add three @react-three/fiber @react-three/drei gsap howler
-bun add -D @types/three
+bun add @react-three/postprocessing @tanstack/react-table
 ```
 
-Yangi/o'zgaradigan fayllar:
-- `src/routes/gallery.tsx` — yangi route + SEO head
-- `src/components/gallery/Scene.tsx` — R3F Canvas, kamera rig
-- `src/components/gallery/Alcove.tsx` — bitta room (lighting + product card)
-- `src/components/gallery/useScrollCamera.ts` — GSAP ScrollTrigger spline
-- `src/components/gallery/useSoundscape.ts` — Howler manager
-- `src/components/gallery/RoomIndicator.tsx` — vertical dots
-- `src/components/layout/BottomNav.tsx` — mobile tab bar
-- `src/components/layout/Sidebar.tsx` — redesign
-- `src/components/layout/Topbar.tsx` — audio toggle, mobile compact, real search dropdown
-- `src/components/layout/AppShell.tsx` — bottom nav padding, mobile branch
-- `src/routes/settings.tsx` — kengaytirilgan sozlamalar
-- `src/lib/store.ts` — `audioEnabled`, `volume`, `lighting`, `searchIndex` qo'shiladi
-- `src/styles.css` — yangi tokenlar (fog, glass-2, safe-area utility)
+Store kengayadi (`src/lib/store.ts`):
+- `filters: { level, status, sort }`
+- `notifications: { read: Set, items }`
+- `audioReady: boolean` (autoplay unlock flag)
+- `language: 'uz' | 'en'`
 
-Performance:
-- `Suspense` + lazy Canvas (faqat `/gallery` da yuklanadi)
-- DPR clamp `[1, 1.75]`, mobile'da `<2` rooms only + statik fallback agar GPU zaif (detect via `WEBGL_debug_renderer_info`)
-- Reduced-motion: GSAP timeline'lar darhol final state'ga o'tadi, audio off
+Yangi/o'zgaradigan fayllar (xulosa):
+- `src/components/gallery/*` (Scene qayta, Alcove, AlcoveModal, useScrollCamera)
+- `src/assets/gallery/*.jpg` (6 ta AI image)
+- `src/components/layout/Topbar.tsx` (Popover search, audio fix, dropdown)
+- `src/components/layout/Sidebar.tsx` (Pro CTA olib tashlash, Filters panel)
+- `src/routes/grades.tsx` (to'liq sahifa + tabs)
+- `src/routes/learning.tsx` (kurslar grid + filtrlar)
+- `src/routes/settings.tsx` (tabs)
+- `src/lib/store.ts` (filters, notifications, audio, lang)
+- `src/styles.css` (typography tokens, focus rings)
 
 ## Yetkazib berish tartibi
 
-1. Paketlar + store kengayishi + tokenlar
-2. Sidebar redesign + Topbar (audio toggle, search dropdown, real menular)
-3. `/gallery` Scene + Alcove + lighting
-4. GSAP scroll camera + RoomIndicator + HTML overlays
-5. Howler soundscape integratsiyasi
-6. Mobile: BottomNav + AppShell shartli render + responsive polish
-7. Settings sahifasi to'ldirish + barcha tugma audit
-8. QA: theme switch, audio toggle, reduced-motion, mobile <768px, tablet 768–1279px, desktop ≥1280px
+1. Bug fix: search overlay (tezkor)
+2. Store kengayishi + Sidebar (Pro CTA → Filters)
+3. AI images generatsiya (6 ta nano-banana premium)
+4. Gallery Scene v2 (Alcove + postprocessing + modal)
+5. GSAP scroll camera silliqlash
+6. Audio (Howler) tuzatish + Settings audio tabi
+7. Grades sahifasi (jadval + heatmap + sertifikatlar)
+8. Learning sahifasi (filtrlangan grid)
+9. Topbar avatar dropdown + Settings tabs
+10. UI/UX polish, tipografiya, fokus ringlar
+11. To'liq QA: har sahifa, har tugma, mobile + desktop, light + dark
+
+## Natija
+- 0 ta visual bug (search overlay tuzatildi)
+- 3D galereya — AI atmosfera + postprocessing + interaktiv
+- Har bir tugma real ishlaydi (audio, profile, settings, notif, filters)
+- Davomat va baholar to'liq funksional
+- Pro CTA o'rniga foydali Filtrlar paneli
+- Light/Dark, Mobile/Desktop, Reduced-motion — barchasi yaxshi

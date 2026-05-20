@@ -3,6 +3,7 @@ import { persist } from "zustand/middleware";
 
 export type Theme = "dark" | "light";
 export type Lighting = "dim" | "normal" | "bright";
+export type Language = "uz" | "en";
 
 export type Todo = {
   id: string;
@@ -20,6 +21,12 @@ export type Notification = {
   read: boolean;
 };
 
+export type Filters = {
+  level: "all" | "beginner" | "mid" | "advanced";
+  status: "all" | "active" | "done";
+  sort: "new" | "old" | "rating";
+};
+
 type User = { name: string; email: string };
 
 type AppState = {
@@ -35,6 +42,7 @@ type AppState = {
   removeTodo: (id: string) => void;
   notifications: Notification[];
   markAllRead: () => void;
+  markRead: (id: string) => void;
   audioEnabled: boolean;
   toggleAudio: () => void;
   volume: number;
@@ -43,6 +51,13 @@ type AppState = {
   cycleLighting: () => void;
   sidebarCollapsed: boolean;
   toggleSidebar: () => void;
+  filters: Filters;
+  setFilters: (f: Partial<Filters>) => void;
+  resetFilters: () => void;
+  language: Language;
+  setLanguage: (l: Language) => void;
+  notifPrefs: Record<string, boolean>;
+  toggleNotifPref: (k: string) => void;
 };
 
 const initialTodos: Todo[] = [
@@ -59,6 +74,7 @@ const initialNotifs: Notification[] = [
 ];
 
 const lightingOrder: Lighting[] = ["dim", "normal", "bright"];
+const defaultFilters: Filters = { level: "all", status: "all", sort: "new" };
 
 export const useApp = create<AppState>()(
   persist(
@@ -78,6 +94,8 @@ export const useApp = create<AppState>()(
       notifications: initialNotifs,
       markAllRead: () =>
         set((s) => ({ notifications: s.notifications.map((n) => ({ ...n, read: true })) })),
+      markRead: (id) =>
+        set((s) => ({ notifications: s.notifications.map((n) => (n.id === id ? { ...n, read: true } : n)) })),
       audioEnabled: false,
       toggleAudio: () => set((s) => ({ audioEnabled: !s.audioEnabled })),
       volume: 0.4,
@@ -89,6 +107,13 @@ export const useApp = create<AppState>()(
         })),
       sidebarCollapsed: false,
       toggleSidebar: () => set((s) => ({ sidebarCollapsed: !s.sidebarCollapsed })),
+      filters: defaultFilters,
+      setFilters: (f) => set((s) => ({ filters: { ...s.filters, ...f } })),
+      resetFilters: () => set({ filters: defaultFilters }),
+      language: "uz",
+      setLanguage: (language) => set({ language }),
+      notifPrefs: { material: true, grade: true, payment: true, weekly: false },
+      toggleNotifPref: (k) => set((s) => ({ notifPrefs: { ...s.notifPrefs, [k]: !s.notifPrefs[k] } })),
     }),
     { name: "edupro-app" }
   )
