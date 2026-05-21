@@ -2,7 +2,8 @@ import { createFileRoute } from "@tanstack/react-router";
 import { AppShell } from "@/components/layout/AppShell";
 import { useState, useRef, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Send, Bot, Sparkles, Cpu, Brain, RotateCcw, Copy, Check } from "lucide-react";
+import { Send, Sparkles, Cpu, Brain, RotateCcw, Copy, Check } from "lucide-react";
+import { PageHero } from "@/components/layout/PageHero";
 import { cn } from "@/lib/utils";
 import { streamAnthropicMessage, streamGeminiMessage, streamOpenAIMessage, type ChatMessage, type AIProvider } from "@/lib/ai-client";
 import { toast } from "sonner";
@@ -109,25 +110,27 @@ function AIAssistantPage() {
     <AppShell>
       <div className="flex h-[calc(100vh-120px)] min-h-[500px] flex-col gap-3 md:h-[calc(100vh-100px)]">
         {/* Header */}
-        <div className="glass rounded-2xl p-3 shadow-card md:p-4">
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <h1 className="text-xl font-bold md:text-2xl">
-                <span className="text-gradient-primary">AI Yordamchi</span>
-                <span className="ml-2 rounded-md bg-primary/15 px-2 py-0.5 text-xs font-bold text-primary">v6</span>
-              </h1>
-              <p className="text-xs text-muted-foreground">3 ta AI model bilan o'qishingizni kuchaytiring</p>
-            </div>
+        <PageHero
+          image="/images/ai-hero.png"
+          title="AI Yordamchi"
+          subtitle="Claude, Gemini va GPT-4 bilan bilimingizni chuqurlashtiring"
+          badge="✨ v6 · AI Platform"
+          badgeClass="bg-violet-500/20 border border-violet-500/30 text-violet-300"
+          height="min-h-[120px]"
+        >
+          <div className="flex items-center gap-2">
             <button
               onClick={clearChat}
-              className="inline-flex items-center gap-1.5 self-start rounded-xl border border-border bg-card px-3 py-1.5 text-xs text-muted-foreground transition-colors hover:bg-accent hover:text-foreground sm:self-auto"
+              className="inline-flex items-center gap-1.5 rounded-xl border border-border/60 bg-black/30 backdrop-blur px-3 py-1.5 text-xs text-white/70 transition-colors hover:bg-black/50 hover:text-white"
             >
               <RotateCcw className="h-3.5 w-3.5" /> Tozalash
             </button>
           </div>
+        </PageHero>
 
-          {/* Provider tabs */}
-          <div className="mt-3 flex gap-2 overflow-x-auto pb-1">
+        {/* Provider tabs */}
+        <div className="glass rounded-2xl p-3 shadow-card md:p-4">
+          <div className="flex gap-2 overflow-x-auto pb-1">
             {PROVIDERS.map((p) => {
               const Icon = p.icon;
               const active = provider === p.id;

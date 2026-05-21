@@ -6,6 +6,7 @@ import { Play, Pause, RotateCcw, SkipForward, Volume2, VolumeX, Coffee, Zap, Bra
 import { toast } from "sonner";
 import { useApp } from "@/lib/store";
 import { cn } from "@/lib/utils";
+import { PageHero } from "@/components/layout/PageHero";
 
 export const Route = createFileRoute("/timer")({
   head: () => ({
@@ -111,25 +112,26 @@ function TimerPage() {
 
   return (
     <AppShell>
+      <PageHero
+        image="/images/timer-hero.png"
+        title="Study Timer"
+        subtitle="Pomodoro texnikasi bilan samarali o'qing"
+        badge="⏱ Focus Mode"
+        badgeClass="bg-violet-500/20 border border-violet-500/30 text-violet-300"
+      />
       <div className="glass rounded-3xl p-4 shadow-card md:p-6">
-        <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <h1 className="text-2xl font-bold md:text-3xl">Study Timer</h1>
-            <p className="text-sm text-muted-foreground">Pomodoro texnikasi bilan samarali o'qing</p>
+        <div className="flex items-center justify-end gap-3">
+          <div className="rounded-xl border border-border bg-card px-3 py-2 text-center">
+            <div className="text-lg font-bold text-primary">{sessions}</div>
+            <div className="text-[10px] text-muted-foreground">Sessiya</div>
           </div>
-          <div className="flex gap-3">
-            <div className="rounded-xl border border-border bg-card px-3 py-2 text-center">
-              <div className="text-lg font-bold text-primary">{sessions}</div>
-              <div className="text-[10px] text-muted-foreground">Sessiya</div>
-            </div>
-            <div className="rounded-xl border border-border bg-card px-3 py-2 text-center">
-              <div className="text-lg font-bold">{totalFocusMin}</div>
-              <div className="text-[10px] text-muted-foreground">Daqiqa</div>
-            </div>
-            <div className="rounded-xl border border-border bg-card px-3 py-2 text-center">
-              <div className="text-lg font-bold text-warning">{sessions * 50}</div>
-              <div className="text-[10px] text-muted-foreground">XP</div>
-            </div>
+          <div className="rounded-xl border border-border bg-card px-3 py-2 text-center">
+            <div className="text-lg font-bold">{totalFocusMin}</div>
+            <div className="text-[10px] text-muted-foreground">Daqiqa</div>
+          </div>
+          <div className="rounded-xl border border-border bg-card px-3 py-2 text-center">
+            <div className="text-lg font-bold text-warning">{sessions * 50}</div>
+            <div className="text-[10px] text-muted-foreground">XP</div>
           </div>
         </div>
       </div>

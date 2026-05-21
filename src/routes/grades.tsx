@@ -8,6 +8,7 @@ import { Search, Download, Trophy, CalendarCheck2, Clock, AlertCircle } from "lu
 import { motion } from "framer-motion";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { PageHero } from "@/components/layout/PageHero";
 
 export const Route = createFileRoute("/grades")({
   head: () => ({ meta: [{ title: "Davomat va Baholar — EduPro" }], links: [{ rel: "canonical", href: "/grades" }] }),
@@ -63,9 +64,14 @@ function GradesPage() {
 
   return (
     <AppShell>
+      <PageHero
+        image="/images/learning-hero.png"
+        title="Davomat va Baholar"
+        subtitle="Baholar, davomat va sertifikatlaringizni bir joyda ko'ring"
+        badge="📊 Grades"
+        badgeClass="bg-blue-500/20 border border-blue-500/30 text-blue-300"
+      />
       <div className="glass rounded-3xl p-4 shadow-card md:p-6">
-        <h1 className="text-2xl font-bold md:text-3xl">Davomat va Baholar</h1>
-        <p className="mt-1 text-sm text-muted-foreground">Baholar, davomat heatmap va sertifikatlaringizni bir joyda ko'ring.</p>
         <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4 md:gap-3">
           <Stat label="O'rtacha ball" value={`${avg}/100`} icon={Trophy} />
           <Stat label="Davomat" value={`${attendPct}%`} icon={CalendarCheck2} />

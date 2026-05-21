@@ -51,7 +51,7 @@ function GalleryPage() {
               className="pointer-events-none fixed inset-x-0 z-20 mx-auto max-w-2xl px-4 text-center"
               style={{ top: isMobile ? "72px" : "88px" }}
             >
-              <div className="text-[10px] uppercase tracking-[0.3em] text-white/40">EduPro · v5</div>
+              <div className="text-[10px] uppercase tracking-[0.3em] text-white/40">EduPro · v6 · AI Platform</div>
               <h1 className="mt-1.5 text-2xl font-bold text-white drop-shadow-lg md:text-4xl lg:text-5xl">
                 Har bir kurs — <span className="text-gradient-primary">o'z xonasi</span>
               </h1>

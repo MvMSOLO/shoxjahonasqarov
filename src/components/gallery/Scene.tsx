@@ -16,6 +16,8 @@ import uiuxImg from "@/assets/gallery/uiux.jpg";
 import pythonImg from "@/assets/gallery/python.jpg";
 import linuxImg from "@/assets/gallery/linux.jpg";
 
+const aiGalleryImg = "/images/ai-hero.png";
+
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
 }
@@ -41,6 +43,7 @@ const ROOMS: Room[] = [
   { id: "uiux", name: "UI / UX Design", tag: "Design", color: "#F43F5E", accent: "#FB7185", percent: 30, blurb: "Tadqiqot, prototip, design system.", image: uiuxImg, details: "Foydalanuvchi tadqiqoti, Figma master class va dizayn tizimi.", duration: "6 hafta", lessons: 20 },
   { id: "py", name: "Python Backend", tag: "Backend", color: "#8B5CF6", accent: "#C4B5FD", percent: 55, blurb: "FastAPI, async, ORM.", image: pythonImg, details: "Data engineering, ML pipelines va high-performance API.", duration: "10 hafta", lessons: 30 },
   { id: "linux", name: "Linux & Shell", tag: "Sysadmin", color: "#22C55E", accent: "#86EFAC", percent: 60, blurb: "Bash, networking, server hardening.", image: linuxImg, details: "System administration, bash scripting, security va networking.", duration: "8 hafta", lessons: 26 },
+  { id: "ai", name: "AI & ML Basics", tag: "AI · v6", color: "#A855F7", accent: "#D8B4FE", percent: 15, blurb: "LLM, prompt engineering, agentic AI.", image: aiGalleryImg, details: "ChatGPT, Claude, Gemini API integratsiyasi va AI application qurish.", duration: "6 hafta", lessons: 18 },
 ];
 
 const SPACING = 9;

@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { PageHero } from "@/components/layout/PageHero";
 
 export const Route = createFileRoute("/support")({
   head: () => ({
@@ -87,6 +88,13 @@ function SupportPage() {
 
   return (
     <AppShell>
+      <PageHero
+        image="/images/ai-hero.png"
+        title="Qo'llab-quvvatlash"
+        subtitle="Biz har doim siz uchun yordam berishga tayyormiz"
+        badge="🎧 Support"
+        badgeClass="bg-emerald-500/20 border border-emerald-500/30 text-emerald-300"
+      />
       <div className="glass rounded-3xl p-4 shadow-card md:p-6">
         <div className="flex items-start gap-3">
           <div className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-gradient-primary shadow-glow">

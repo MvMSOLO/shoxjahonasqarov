@@ -6,6 +6,7 @@ import { Play, Clock, BookOpen, Star, CheckCircle2 } from "lucide-react";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { PageHero } from "@/components/layout/PageHero";
 
 export const Route = createFileRoute("/learning")({
   head: () => ({ meta: [{ title: "O'quv jarayoni — EduPro" }, { name: "description", content: "Kurslar va o'quv jarayoni." }], links: [{ rel: "canonical", href: "/learning" }] }),
@@ -53,11 +54,14 @@ function LearningPage() {
 
   return (
     <AppShell>
+      <PageHero
+        image="/images/learning-hero.png"
+        title="O'quv jarayoni"
+        subtitle="Kurslar, darslar va o'quv materiallaringiz"
+        badge="📚 O'quv"
+        badgeClass="bg-cyan-500/20 border border-cyan-500/30 text-cyan-300"
+      />
       <div className="glass rounded-3xl p-4 shadow-card md:p-6">
-        <h1 className="text-2xl font-bold md:text-3xl">O'quv jarayoni</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Sidebar filtrlari yordamida kurslarni daraja, holat va saralashga ko'ra ko'ring.
-        </p>
 
         <div className="mt-4 grid grid-cols-3 gap-2 sm:gap-3">
           <div className="rounded-xl border border-border bg-card p-2.5 text-center sm:p-3">

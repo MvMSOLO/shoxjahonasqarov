@@ -3,6 +3,7 @@ import { AppShell } from "@/components/layout/AppShell";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Brain, Trophy, RotateCcw, CheckCircle2, XCircle, Zap, ChevronRight, Star } from "lucide-react";
+import { PageHero } from "@/components/layout/PageHero";
 import { cn } from "@/lib/utils";
 import { generateQuiz, type QuizQuestion } from "@/lib/ai-client";
 import { toast } from "sonner";
@@ -85,25 +86,20 @@ function QuizPage() {
     <AppShell>
       <div className="mx-auto max-w-2xl space-y-4">
         {/* Header */}
-        <div className="glass rounded-2xl p-4 shadow-card md:p-6">
-          <div className="flex items-center gap-3">
-            <div className="grid h-12 w-12 place-items-center rounded-2xl bg-gradient-to-br from-violet-500 to-purple-600 shadow-glow">
-              <Brain className="h-6 w-6 text-white" />
+        <PageHero
+          image="/images/quiz-hero.png"
+          title="AI Quiz"
+          subtitle="Bilimingizni sinang — XP yig'ing va o'sib boring"
+          badge="🧠 AI Quiz · v6"
+          badgeClass="bg-violet-500/20 border border-violet-500/30 text-violet-300"
+          height="min-h-[120px]"
+        >
+          {totalXP > 0 && (
+            <div className="inline-flex items-center gap-1.5 rounded-xl bg-gradient-warning px-3 py-1.5 text-xs font-bold text-warning-foreground">
+              <Zap className="h-3.5 w-3.5" /> +{totalXP} XP
             </div>
-            <div>
-              <h1 className="text-xl font-bold md:text-2xl">
-                <span className="text-gradient-primary">AI Quiz</span>
-                <span className="ml-2 rounded-md bg-primary/15 px-2 py-0.5 text-xs font-bold text-primary">v6</span>
-              </h1>
-              <p className="text-xs text-muted-foreground">Bilimingizni sinang — XP yig'ing</p>
-            </div>
-            {totalXP > 0 && (
-              <div className="ml-auto flex items-center gap-1.5 rounded-xl bg-gradient-warning px-3 py-1.5 text-xs font-bold text-warning-foreground">
-                <Zap className="h-3.5 w-3.5" /> +{totalXP} XP
-              </div>
-            )}
-          </div>
-        </div>
+          )}
+        </PageHero>
 
         <AnimatePresence mode="wait">
           {/* Topic select */}

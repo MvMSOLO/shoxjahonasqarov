@@ -26,14 +26,14 @@ import { cn } from "@/lib/utils";
 const nav = [
   { to: "/", label: "Dashboard", icon: LayoutDashboard },
   { to: "/learning", label: "O'quv jarayoni", icon: BookOpen },
-  { to: "/ai-assistant", label: "AI Yordamchi", icon: Sparkles, badge: "AI", badgeClass: "bg-gradient-to-r from-violet-500 to-purple-600" },
-  { to: "/quiz", label: "AI Quiz", icon: Brain, badge: "NEW", badgeClass: "bg-gradient-rose" },
   { to: "/gallery", label: "3D Galereya", icon: Boxes, badge: "3D", badgeClass: "bg-gradient-primary" },
   { to: "/timer", label: "Study Timer", icon: Timer },
   { to: "/grades", label: "Davomat va Baholar", icon: BarChart3 },
   { to: "/finance", label: "Moliya va To'lovlar", icon: Wallet },
   { to: "/support", label: "Qo'llab-quvvatlash", icon: Headphones },
   { to: "/settings", label: "Sozlamalar", icon: Settings },
+  { to: "/ai-assistant", label: "AI Yordamchi", icon: Sparkles, badge: "AI", badgeClass: "bg-gradient-to-r from-violet-500 to-purple-600" },
+  { to: "/quiz", label: "AI Quiz", icon: Brain, badge: "NEW", badgeClass: "bg-gradient-rose" },
 ] as const;
 
 const levelOpts = [

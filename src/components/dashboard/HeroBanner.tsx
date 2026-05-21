@@ -13,10 +13,10 @@ export function HeroBanner() {
       className="relative overflow-hidden rounded-3xl shadow-card"
       style={{ minHeight: 168 }}
     >
-      {/* Background gradient (no external image dependency) */}
-      <div className="absolute inset-0 bg-gradient-to-br from-primary/30 via-primary/10 to-transparent" />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,oklch(0.62_0.22_280/25%),transparent_60%)]" />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,oklch(0.7_0.2_305/15%),transparent_60%)]" />
+      {/* Background image */}
+      <img src="/images/hero-banner.png" alt="" className="absolute inset-0 h-full w-full object-cover" loading="eager" />
+      <div className="absolute inset-0 bg-gradient-to-r from-background/95 via-background/75 to-background/30" />
+      <div className="absolute inset-0 bg-gradient-to-t from-background/70 to-transparent" />
       {/* Animated orbs */}
       <motion.div
         animate={{ scale: [1, 1.1, 1], opacity: [0.3, 0.5, 0.3] }}

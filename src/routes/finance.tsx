@@ -13,6 +13,7 @@ import { AreaChart, Area, ResponsiveContainer, XAxis, YAxis, Tooltip } from "rec
 import { ClientOnly } from "@/components/ui/client-only";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { PageHero } from "@/components/layout/PageHero";
 
 export const Route = createFileRoute("/finance")({
   head: () => ({
@@ -45,9 +46,14 @@ function FinancePage() {
 
   return (
     <AppShell>
+      <PageHero
+        image="/images/finance-hero.png"
+        title="Moliya va To'lovlar"
+        subtitle="Balans, to'lovlar va moliyaviy tarix"
+        badge="💳 Finance"
+        badgeClass="bg-amber-500/20 border border-amber-500/30 text-amber-300"
+      />
       <div className="glass rounded-3xl p-4 shadow-card md:p-6">
-        <h1 className="text-2xl font-bold md:text-3xl">Moliya va To'lovlar</h1>
-        <p className="mt-1 text-sm text-muted-foreground">Balans, to'lovlar va moliyaviy tarix.</p>
 
         <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-3">
           <motion.div

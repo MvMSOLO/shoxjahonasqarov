@@ -24,3 +24,27 @@ id = "HvhT4S-P1RKi2la8aIVtk"
 uri = "file://public/images/learning-hero.png"
 type = "image"
 title = "generated_image"
+
+[[generated]]
+id = "zYABBIRyWoGdoX3EK62nn"
+uri = "file://public/images/ai-hero.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "aC59JiRYD-Y_-TX_WjGjh"
+uri = "file://public/images/quiz-hero.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "w5t41_k-ny8364YQkEHv9"
+uri = "file://public/images/finance-hero.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "M5QmjGaMk9zU3uHMFB4JO"
+uri = "file://public/images/gallery-hero.png"
+type = "image"
+title = "generated_image"
