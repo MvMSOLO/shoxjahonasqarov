@@ -12,15 +12,16 @@ import { BalanceCard } from "@/components/dashboard/BalanceCard";
 import { NewsCard } from "@/components/dashboard/NewsCard";
 import { LeaderboardCard } from "@/components/dashboard/LeaderboardCard";
 import { StudyTimerWidget } from "@/components/dashboard/StudyTimerWidget";
+import { AchievementsCard } from "@/components/dashboard/AchievementsCard";
+import { HeroBanner } from "@/components/dashboard/HeroBanner";
 import { stats } from "@/lib/mock-data";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Dashboard — EduPro Student Panel" },
+      { title: "Dashboard — EduPro Student Panel v5" },
       { name: "description", content: "EduPro o'quvchi paneli — kurs progressi, dars jadvali, vazifalar va balans." },
-      { property: "og:title", content: "EduPro — Student Dashboard" },
-      { property: "og:description", content: "Premium dark mode o'quv paneli." },
+      { property: "og:title", content: "EduPro — Student Dashboard v5" },
     ],
     links: [{ rel: "canonical", href: "/" }],
   }),
@@ -34,11 +35,13 @@ function Index() {
         <>
           <NextLessonCard />
           <StudyTimerWidget />
+          <AchievementsCard />
           <TodoCard />
           <BalanceCard />
         </>
       }
     >
+      <HeroBanner />
       <CourseProgressCard />
       <div className="grid gap-3 grid-cols-2 md:gap-4 xl:grid-cols-4">
         {stats.map((s, i) => (

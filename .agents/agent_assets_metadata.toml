@@ -1,0 +1,26 @@
+uploads = []
+outputs = []
+
+[[generated]]
+id = "Iy-UkDRxZxL08DvHd7Qnv"
+uri = "file://public/images/hero-banner.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "tkupmmhcfiTJTvWvN57TY"
+uri = "file://public/images/achievement-trophy.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "7a9pfLTw5x62uku82fo8U"
+uri = "file://public/images/timer-hero.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "HvhT4S-P1RKi2la8aIVtk"
+uri = "file://public/images/learning-hero.png"
+type = "image"
+title = "generated_image"

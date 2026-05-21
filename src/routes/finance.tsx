@@ -10,6 +10,7 @@ import { transactions, paymentSchedule } from "@/lib/mock-data";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AreaChart, Area, ResponsiveContainer, XAxis, YAxis, Tooltip } from "recharts";
+import { ClientOnly } from "@/components/ui/client-only";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
@@ -116,12 +117,7 @@ function FinancePage() {
             <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
               <div className="relative flex-1 max-w-xs">
                 <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                <Input
-                  value={q}
-                  onChange={(e) => setQ(e.target.value)}
-                  placeholder="Tranzaksiya qidirish..."
-                  className="pl-9"
-                />
+                <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Tranzaksiya qidirish..." className="pl-9" />
               </div>
               <button
                 onClick={() => toast.success("CSV yuklanmoqda...")}
@@ -162,9 +158,7 @@ function FinancePage() {
                 </motion.div>
               ))}
               {filtered.length === 0 && (
-                <div className="py-8 text-center text-sm text-muted-foreground">
-                  Tranzaksiya topilmadi
-                </div>
+                <div className="py-8 text-center text-sm text-muted-foreground">Tranzaksiya topilmadi</div>
               )}
             </div>
           </div>
@@ -174,29 +168,31 @@ function FinancePage() {
           <div className="glass rounded-2xl p-4 shadow-card md:p-5">
             <h2 className="text-base font-bold">Oylik moliyaviy grafik</h2>
             <p className="text-xs text-muted-foreground">Kirim va chiqim taqqoslash</p>
-            <div className="mt-4 h-60">
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={monthlyData} margin={{ top: 4, right: 4, left: 4, bottom: 0 }}>
-                  <defs>
-                    <linearGradient id="incomeGrad" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="oklch(0.7 0.18 160)" stopOpacity={0.5} />
-                      <stop offset="100%" stopColor="oklch(0.7 0.18 160)" stopOpacity={0} />
-                    </linearGradient>
-                    <linearGradient id="expenseGrad" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="oklch(0.65 0.24 22)" stopOpacity={0.5} />
-                      <stop offset="100%" stopColor="oklch(0.65 0.24 22)" stopOpacity={0} />
-                    </linearGradient>
-                  </defs>
-                  <XAxis dataKey="month" tick={{ fontSize: 11 }} axisLine={false} tickLine={false} />
-                  <YAxis tick={{ fontSize: 11 }} axisLine={false} tickLine={false} tickFormatter={(v) => `${(v / 1000).toFixed(0)}k`} />
-                  <Tooltip
-                    formatter={(value: number) => [`${value.toLocaleString()} so'm`]}
-                    contentStyle={{ background: "oklch(0.21 0.045 270)", border: "1px solid oklch(0.32 0.04 270 / 60%)", borderRadius: "12px", fontSize: 12 }}
-                  />
-                  <Area type="monotone" dataKey="income" name="Kirim" stroke="oklch(0.7 0.18 160)" strokeWidth={2} fill="url(#incomeGrad)" />
-                  <Area type="monotone" dataKey="expense" name="Chiqim" stroke="oklch(0.65 0.24 22)" strokeWidth={2} fill="url(#expenseGrad)" />
-                </AreaChart>
-              </ResponsiveContainer>
+            <div className="mt-4 h-64" suppressHydrationWarning>
+              <ClientOnly fallback={<div className="h-full w-full animate-pulse rounded-xl bg-muted/40" />}>
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={monthlyData} margin={{ top: 4, right: 4, left: 4, bottom: 0 }}>
+                    <defs>
+                      <linearGradient id="incomeGrad" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor="oklch(0.7 0.18 160)" stopOpacity={0.5} />
+                        <stop offset="100%" stopColor="oklch(0.7 0.18 160)" stopOpacity={0} />
+                      </linearGradient>
+                      <linearGradient id="expenseGrad" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor="oklch(0.65 0.24 22)" stopOpacity={0.5} />
+                        <stop offset="100%" stopColor="oklch(0.65 0.24 22)" stopOpacity={0} />
+                      </linearGradient>
+                    </defs>
+                    <XAxis dataKey="month" tick={{ fontSize: 11 }} axisLine={false} tickLine={false} />
+                    <YAxis tick={{ fontSize: 11 }} axisLine={false} tickLine={false} tickFormatter={(v) => `${(v / 1000).toFixed(0)}k`} />
+                    <Tooltip
+                      formatter={(value: number) => [`${value.toLocaleString()} so'm`]}
+                      contentStyle={{ background: "var(--color-card)", border: "1px solid var(--color-border)", borderRadius: "12px", fontSize: 12 }}
+                    />
+                    <Area type="monotone" dataKey="income" name="Kirim" stroke="oklch(0.7 0.18 160)" strokeWidth={2} fill="url(#incomeGrad)" />
+                    <Area type="monotone" dataKey="expense" name="Chiqim" stroke="oklch(0.65 0.24 22)" strokeWidth={2} fill="url(#expenseGrad)" />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </ClientOnly>
             </div>
             <div className="mt-4 flex items-center gap-4 text-xs">
               <span className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-full bg-success" /> Kirim</span>
@@ -242,10 +238,9 @@ function FinancePage() {
                   <p className="text-sm font-semibold">Avtomatik to'lov</p>
                   <p className="mt-0.5 text-xs text-muted-foreground">
                     Har oyning 1-sanasida kartangizdan avtomatik hisobdan chiqariladi.
-                    Muammo bo'lsa, qo'llab-quvvatlash xizmatiga murojaat qiling.
                   </p>
                   <button
-                    onClick={() => toast.success("To'lov amalga oshirildi!")}
+                    onClick={() => toast.success("To'lov amalga oshirildi! Rahmat 🎉")}
                     className="mt-3 inline-flex items-center gap-1.5 rounded-xl bg-gradient-primary px-4 py-2 text-xs font-semibold text-primary-foreground shadow-glow transition-opacity hover:opacity-90"
                   >
                     <CreditCard className="h-3.5 w-3.5" /> Hozir to'lash

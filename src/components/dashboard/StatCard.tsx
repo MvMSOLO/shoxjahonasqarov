@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { ResponsiveContainer, AreaChart, Area } from "recharts";
 import { Calendar, Star, ClipboardList, Wallet, type LucideIcon } from "lucide-react";
+import { ClientOnly } from "@/components/ui/client-only";
 
 const ICONS: Record<string, LucideIcon> = {
   calendar: Calendar,
@@ -40,18 +41,20 @@ export function StatCard({ stat, index }: { stat: Stat; index: number }) {
         </div>
       </div>
       <div className="mt-2 text-xs text-muted-foreground">{stat.hint}</div>
-      <div className="-mx-4 -mb-4 mt-2 h-14">
-        <ResponsiveContainer width="100%" height="100%">
-          <AreaChart data={data} margin={{ top: 2, right: 0, left: 0, bottom: 0 }}>
-            <defs>
-              <linearGradient id={`grad-${stat.key}`} x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor={g.from} />
-                <stop offset="100%" stopColor={g.to} />
-              </linearGradient>
-            </defs>
-            <Area type="monotone" dataKey="v" stroke={g.stroke} strokeWidth={2} fill={`url(#grad-${stat.key})`} />
-          </AreaChart>
-        </ResponsiveContainer>
+      <div className="-mx-4 -mb-4 mt-2 h-14" suppressHydrationWarning>
+        <ClientOnly fallback={<div className="h-full w-full" />}>
+          <ResponsiveContainer width="100%" height="100%">
+            <AreaChart data={data} margin={{ top: 2, right: 0, left: 0, bottom: 0 }}>
+              <defs>
+                <linearGradient id={`grad-${stat.key}`} x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor={g.from} />
+                  <stop offset="100%" stopColor={g.to} />
+                </linearGradient>
+              </defs>
+              <Area type="monotone" dataKey="v" stroke={g.stroke} strokeWidth={2} fill={`url(#grad-${stat.key})`} />
+            </AreaChart>
+          </ResponsiveContainer>
+        </ClientOnly>
       </div>
     </motion.div>
   );
