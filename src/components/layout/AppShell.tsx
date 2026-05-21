@@ -22,10 +22,10 @@ export function AppShell({ children, rightRail }: { children: ReactNode; rightRa
       </div>
       <div className="flex min-w-0 flex-1 flex-col">
         <Topbar />
-        <div className="flex flex-1 flex-col gap-4 p-3 pb-24 md:gap-5 md:p-5 lg:pb-6 xl:flex-row xl:p-6">
-          <main className="min-w-0 flex-1 space-y-4 md:space-y-5">{children}</main>
+        <div className="flex flex-1 flex-col gap-2 overflow-hidden px-2 py-3 pb-20 sm:gap-3 sm:p-3 md:gap-4 md:p-4 lg:pb-6 lg:p-5 xl:gap-5 xl:flex-row xl:p-6">
+          <main className="min-w-0 flex-1 space-y-2 sm:space-y-3 md:space-y-4 lg:space-y-5 overflow-y-auto">{children}</main>
           {rightRail && (
-            <aside className="w-full shrink-0 space-y-4 md:space-y-5 xl:w-[340px]">{rightRail}</aside>
+            <aside className="w-full shrink-0 space-y-2 overflow-y-auto sm:space-y-3 md:space-y-4 lg:space-y-5 xl:w-80 xl:max-h-[calc(100vh-5rem)]">{rightRail}</aside>
           )}
         </div>
       </div>

@@ -29,19 +29,21 @@ export function StatCard({ stat, index }: { stat: Stat; index: number }) {
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.05 * index, ease: "easeOut" }}
-      className="glass relative overflow-hidden rounded-2xl p-4 shadow-card transition-transform hover:-translate-y-0.5"
+      whileHover={{ scale: 1.02, y: -4 }}
+      whileTap={{ scale: 0.98 }}
+      className="glass relative overflow-hidden rounded-2xl p-3 sm:p-4 shadow-card transition-all cursor-pointer"
     >
-      <div className="flex items-start justify-between gap-3">
-        <div className={`grid h-11 w-11 place-items-center rounded-xl ${g.bg} shadow-md`}>
-          <Icon className="h-5 w-5 text-white" />
+      <div className="flex items-start justify-between gap-2 sm:gap-3">
+        <div className={`grid h-10 w-10 sm:h-11 sm:w-11 place-items-center rounded-xl ${g.bg} shadow-md shrink-0`}>
+          <Icon className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
         </div>
-        <div className="text-right">
-          <div className="text-xs text-muted-foreground">{stat.label}</div>
-          <div className="text-2xl font-bold tracking-tight">{stat.value}</div>
+        <div className="text-right min-w-0">
+          <div className="text-[11px] sm:text-xs text-muted-foreground truncate">{stat.label}</div>
+          <div className="text-lg sm:text-2xl font-bold tracking-tight">{stat.value}</div>
         </div>
       </div>
-      <div className="mt-2 text-xs text-muted-foreground">{stat.hint}</div>
-      <div className="-mx-4 -mb-4 mt-2 h-14" suppressHydrationWarning>
+      <div className="mt-2 text-[10px] sm:text-xs text-muted-foreground">{stat.hint}</div>
+      <div className="-mx-3 sm:-mx-4 -mb-3 sm:-mb-4 mt-2 h-12 sm:h-14" suppressHydrationWarning>
         <ClientOnly fallback={<div className="h-full w-full" />}>
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart data={data} margin={{ top: 2, right: 0, left: 0, bottom: 0 }}>

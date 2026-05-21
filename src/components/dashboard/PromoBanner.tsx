@@ -47,53 +47,70 @@ export function PromoBanner() {
   const promo = PROMOS[active];
 
   return (
-    <div className="glass overflow-hidden rounded-2xl shadow-card">
-      <div className={`relative bg-gradient-to-br ${promo.gradient} p-4 md:p-5`}>
+    <motion.div
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="glass overflow-hidden rounded-2xl shadow-card"
+    >
+      <div className={`relative bg-gradient-to-br ${promo.gradient} p-3 sm:p-4 md:p-5`}>
         <div className="absolute -right-8 -top-8 h-32 w-32 rounded-full bg-white/5 blur-2xl" />
         <div className="absolute -bottom-4 -left-4 h-24 w-24 rounded-full bg-white/5 blur-2xl" />
 
-        <div className="relative flex items-start justify-between gap-3">
-          <div className="flex-1">
-            <div className="flex items-center gap-2">
-              <span className={cn("rounded-full px-2.5 py-1 text-[10px] font-bold", promo.accent)}>
+        <div className="relative flex flex-col gap-2.5 sm:flex-row sm:items-start sm:justify-between">
+          <div className="flex-1 min-w-0">
+            <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+              <motion.span
+                whileHover={{ scale: 1.05 }}
+                className={cn("rounded-full px-2 py-0.5 sm:px-2.5 sm:py-1 text-[9px] sm:text-[10px] font-bold", promo.accent)}
+              >
                 {promo.badge}
-              </span>
-              <div className="flex items-center gap-1 rounded-full bg-white/10 px-2 py-0.5 text-[10px] text-white/80">
-                <Clock className="h-3 w-3" /> {promo.deadline}
-              </div>
+              </motion.span>
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                className="flex items-center gap-1 rounded-full bg-white/10 px-1.5 py-0.5 sm:px-2 sm:py-0.5 text-[9px] sm:text-[10px] text-white/80"
+              >
+                <Clock className="h-3 w-3 shrink-0" /> {promo.deadline}
+              </motion.div>
             </div>
-            <h3 className="mt-2 text-lg font-bold text-white">{promo.title}</h3>
-            <p className="text-xs text-white/75">{promo.subtitle}</p>
+            <h3 className="mt-1.5 sm:mt-2 text-base sm:text-lg font-bold text-white truncate">{promo.title}</h3>
+            <p className="text-[11px] sm:text-xs text-white/75 line-clamp-1">{promo.subtitle}</p>
 
-            <div className="mt-3 flex items-center gap-2">
-              <button className="inline-flex items-center gap-1.5 rounded-xl bg-white px-3 py-1.5 text-xs font-bold text-gray-900 shadow-md transition-transform hover:scale-105">
-                <Rocket className="h-3.5 w-3.5" />
-                {promo.cta}
-                <ArrowRight className="h-3.5 w-3.5" />
-              </button>
-              <span className="text-[11px] text-white/60">
-                <Zap className="mr-0.5 inline h-3 w-3 text-yellow-400" />
-                {promo.spots} o'rin qoldi
+            <div className="mt-2 sm:mt-3 flex flex-wrap items-center gap-1.5 sm:gap-2">
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="inline-flex items-center gap-1 rounded-lg sm:rounded-xl bg-white px-2.5 py-1 sm:px-3 sm:py-1.5 text-[10px] sm:text-xs font-bold text-gray-900 shadow-md"
+              >
+                <Rocket className="h-3 w-3" />
+                <span className="hidden sm:inline">{promo.cta}</span>
+                <span className="sm:hidden">Go</span>
+                <ArrowRight className="h-3 w-3" />
+              </motion.button>
+              <span className="text-[9px] sm:text-[11px] text-white/60 flex items-center gap-0.5">
+                <Zap className="h-2.5 w-2.5 sm:h-3 sm:w-3 text-yellow-400 shrink-0" />
+                {promo.spots} left
               </span>
             </div>
           </div>
-          <div className="text-4xl">{promo.icon}</div>
+          <div className="text-2xl sm:text-3xl md:text-4xl shrink-0">{promo.icon}</div>
         </div>
 
         {/* Dots */}
-        <div className="mt-3 flex gap-1.5">
+        <div className="mt-2.5 sm:mt-3 flex gap-1 sm:gap-1.5">
           {PROMOS.map((_, i) => (
-            <button
+            <motion.button
               key={i}
               onClick={() => setActive(i)}
+              whileHover={{ scale: 1.2 }}
+              whileTap={{ scale: 0.9 }}
               className={cn(
-                "h-1.5 rounded-full transition-all",
-                i === active ? "w-4 bg-white" : "w-1.5 bg-white/40"
+                "rounded-full transition-all",
+                i === active ? "h-1.5 sm:h-2 w-3 sm:w-4 bg-white" : "h-1 sm:h-1.5 w-1.5 sm:w-2 bg-white/40"
               )}
             />
           ))}
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }

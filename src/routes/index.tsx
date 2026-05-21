@@ -51,17 +51,17 @@ function Index() {
       <HeroBanner />
       <PromoBanner />
       <CourseProgressCard />
-      <div className="grid gap-3 grid-cols-2 md:gap-4 xl:grid-cols-4">
+      <div className="grid gap-2 grid-cols-2 sm:gap-3 md:gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 w-full">
         {stats.map((s, i) => (
           <StatCard key={s.key} stat={s} index={i} />
         ))}
       </div>
       <NewsCard />
-      <div className="grid gap-4 lg:grid-cols-2">
+      <div className="grid gap-3 grid-cols-1 sm:gap-4 sm:grid-cols-2 lg:grid-cols-2 w-full">
         <ScheduleCard />
         <CoursesCard />
       </div>
-      <div className="grid gap-4 lg:grid-cols-2">
+      <div className="grid gap-3 grid-cols-1 sm:gap-4 sm:grid-cols-2 lg:grid-cols-2 w-full">
         <SkillsRadar />
         <ActivityCard />
       </div>

@@ -12,9 +12,13 @@ const COLORS: Record<string, string> = {
 
 export function ActivityCard() {
   return (
-    <div className="glass rounded-2xl p-5 shadow-card">
-      <h3 className="text-lg font-bold">Faoliyatingiz</h3>
-      <ul className="mt-4 space-y-3">
+    <motion.div
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="glass rounded-2xl p-3 sm:p-4 md:p-5 shadow-card"
+    >
+      <h3 className="text-base sm:text-lg font-bold">Faoliyatingiz</h3>
+      <ul className="mt-2 sm:mt-3 md:mt-4 space-y-2 sm:space-y-3">
         {activity.map((a, i) => {
           const Icon = ICONS[i % ICONS.length];
           return (
@@ -23,22 +27,26 @@ export function ActivityCard() {
               initial={{ opacity: 0, x: -10 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: i * 0.05 }}
-              className="flex items-center gap-3 rounded-xl border border-border bg-card/50 p-3"
+              whileHover={{ scale: 1.01 }}
+              className="flex items-center gap-2 sm:gap-3 rounded-xl border border-border bg-card/50 p-2 sm:p-3 transition-all cursor-pointer"
             >
-              <div className={`grid h-10 w-10 place-items-center rounded-xl ${COLORS[a.color]}`}>
-                <Icon className="h-[18px] w-[18px] text-white" />
+              <div className={`grid h-9 w-9 sm:h-10 sm:w-10 place-items-center rounded-xl ${COLORS[a.color]} shrink-0`}>
+                <Icon className="h-4 w-4 sm:h-[18px] sm:w-[18px] text-white" />
               </div>
               <div className="min-w-0 flex-1">
-                <div className="truncate text-sm font-medium">{a.title}</div>
-                <div className="text-xs text-muted-foreground">{a.time}</div>
+                <div className="truncate text-xs sm:text-sm font-medium">{a.title}</div>
+                <div className="text-[10px] sm:text-xs text-muted-foreground">{a.time}</div>
               </div>
-              <span className="rounded-md bg-success/15 px-2 py-0.5 text-xs font-semibold text-success">
+              <motion.span
+                whileHover={{ scale: 1.05 }}
+                className="rounded-md bg-success/15 px-1.5 sm:px-2 py-0.5 text-[9px] sm:text-xs font-semibold text-success whitespace-nowrap shrink-0"
+              >
                 +{a.xp} XP
-              </span>
+              </motion.span>
             </motion.li>
           );
         })}
       </ul>
-    </div>
+    </motion.div>
   );
 }
