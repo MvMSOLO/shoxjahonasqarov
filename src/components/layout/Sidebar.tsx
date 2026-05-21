@@ -16,6 +16,8 @@ import {
   Filter,
   RotateCcw,
   Timer,
+  Sparkles,
+  Brain,
 } from "lucide-react";
 import { useApp } from "@/lib/store";
 import { profile } from "@/lib/mock-data";
@@ -24,8 +26,10 @@ import { cn } from "@/lib/utils";
 const nav = [
   { to: "/", label: "Dashboard", icon: LayoutDashboard },
   { to: "/learning", label: "O'quv jarayoni", icon: BookOpen },
-  { to: "/gallery", label: "3D Galereya", icon: Boxes, badge: "3D" },
-  { to: "/timer", label: "Study Timer", icon: Timer, badge: "NEW" },
+  { to: "/ai-assistant", label: "AI Yordamchi", icon: Sparkles, badge: "AI", badgeClass: "bg-gradient-to-r from-violet-500 to-purple-600" },
+  { to: "/quiz", label: "AI Quiz", icon: Brain, badge: "NEW", badgeClass: "bg-gradient-rose" },
+  { to: "/gallery", label: "3D Galereya", icon: Boxes, badge: "3D", badgeClass: "bg-gradient-primary" },
+  { to: "/timer", label: "Study Timer", icon: Timer },
   { to: "/grades", label: "Davomat va Baholar", icon: BarChart3 },
   { to: "/finance", label: "Moliya va To'lovlar", icon: Wallet },
   { to: "/support", label: "Qo'llab-quvvatlash", icon: Headphones },
@@ -71,6 +75,7 @@ export function Sidebar({ onNavigate, forceExpanded }: { onNavigate?: () => void
     >
       <div className="pointer-events-none absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-primary/10 to-transparent" />
 
+      {/* Logo */}
       <div className="relative flex items-center gap-2.5 px-4 py-5">
         <Link to="/" onClick={onNavigate} className="flex items-center gap-2.5">
           <div className="relative grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-gradient-primary shadow-glow">
@@ -80,8 +85,9 @@ export function Sidebar({ onNavigate, forceExpanded }: { onNavigate?: () => void
           {!collapsed && (
             <div className="overflow-hidden">
               <div className="text-base font-bold tracking-tight">EduPro</div>
-              <div className="-mt-0.5 text-[10px] uppercase tracking-widest text-muted-foreground">
-                Student v5
+              <div className="-mt-0.5 flex items-center gap-1 text-[10px] uppercase tracking-widest text-muted-foreground">
+                Student
+                <span className="rounded bg-primary/20 px-1 py-0.5 text-[9px] font-bold text-primary">v6</span>
               </div>
             </div>
           )}
@@ -97,6 +103,7 @@ export function Sidebar({ onNavigate, forceExpanded }: { onNavigate?: () => void
         )}
       </div>
 
+      {/* Profile card */}
       <div className={cn("relative px-3", collapsed && "px-2")}>
         <div className={cn("glass-2 relative overflow-hidden rounded-2xl", collapsed ? "p-2" : "p-3.5")}>
           <div className={cn("flex items-center", collapsed ? "justify-center" : "gap-3")}>
@@ -138,10 +145,12 @@ export function Sidebar({ onNavigate, forceExpanded }: { onNavigate?: () => void
         </div>
       </div>
 
-      <nav className={cn("relative flex flex-col gap-1 overflow-y-auto px-3 py-4 scrollbar-thin", collapsed && "px-2")}>
+      {/* Nav */}
+      <nav className={cn("relative flex flex-col gap-0.5 overflow-y-auto px-3 py-3 scrollbar-thin", collapsed && "px-2")}>
         {nav.map((item) => {
           const active = path === item.to;
           const Icon = item.icon;
+          const isAI = item.to === "/ai-assistant" || item.to === "/quiz";
           return (
             <Link
               key={item.to}
@@ -152,14 +161,19 @@ export function Sidebar({ onNavigate, forceExpanded }: { onNavigate?: () => void
                 "group relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all",
                 collapsed && "justify-center px-2",
                 active
-                  ? "bg-gradient-primary text-primary-foreground shadow-glow"
+                  ? isAI
+                    ? "bg-gradient-to-r from-violet-500/90 to-purple-600/90 text-white shadow-glow"
+                    : "bg-gradient-primary text-primary-foreground shadow-glow"
                   : "text-sidebar-foreground/75 hover:bg-sidebar-accent hover:text-sidebar-foreground"
               )}
             >
               {active && !collapsed && (
                 <motion.span
                   layoutId="active-rail"
-                  className="absolute -left-3 top-1/2 h-7 w-1 -translate-y-1/2 rounded-r-full bg-primary-glow shadow-glow"
+                  className={cn(
+                    "absolute -left-3 top-1/2 h-7 w-1 -translate-y-1/2 rounded-r-full shadow-glow",
+                    isAI ? "bg-violet-400" : "bg-primary-glow"
+                  )}
                 />
               )}
               <Icon className="h-[18px] w-[18px] shrink-0" />
@@ -167,7 +181,7 @@ export function Sidebar({ onNavigate, forceExpanded }: { onNavigate?: () => void
               {!collapsed && "badge" in item && item.badge && (
                 <span className={cn(
                   "ml-auto rounded-md px-1.5 py-0.5 text-[9px] font-bold text-white",
-                  item.badge === "NEW" ? "bg-gradient-rose" : "bg-gradient-primary"
+                  (item as any).badgeClass || "bg-gradient-primary"
                 )}>
                   {item.badge}
                 </span>
@@ -177,6 +191,7 @@ export function Sidebar({ onNavigate, forceExpanded }: { onNavigate?: () => void
         })}
       </nav>
 
+      {/* Filters */}
       {!collapsed && (
         <div className="relative mx-3 mb-3 rounded-2xl border border-sidebar-border bg-card/40 p-3.5">
           <div className="flex items-center justify-between">
@@ -193,6 +208,7 @@ export function Sidebar({ onNavigate, forceExpanded }: { onNavigate?: () => void
         </div>
       )}
 
+      {/* Daily goal */}
       {!collapsed && (
         <div className="relative mx-3 mb-3 rounded-2xl border border-sidebar-border bg-gradient-card p-3.5">
           <div className="flex items-center justify-between">

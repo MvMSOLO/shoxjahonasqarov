@@ -14,14 +14,19 @@ import { LeaderboardCard } from "@/components/dashboard/LeaderboardCard";
 import { StudyTimerWidget } from "@/components/dashboard/StudyTimerWidget";
 import { AchievementsCard } from "@/components/dashboard/AchievementsCard";
 import { HeroBanner } from "@/components/dashboard/HeroBanner";
+import { AIInsightsCard } from "@/components/dashboard/AIInsightsCard";
+import { PromoBanner } from "@/components/dashboard/PromoBanner";
+import { QuickQuizCard } from "@/components/dashboard/QuickQuizCard";
 import { stats } from "@/lib/mock-data";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Dashboard — EduPro Student Panel v5" },
-      { name: "description", content: "EduPro o'quvchi paneli — kurs progressi, dars jadvali, vazifalar va balans." },
-      { property: "og:title", content: "EduPro — Student Dashboard v5" },
+      { title: "Dashboard — EduPro Student Panel v6" },
+      { name: "description", content: "EduPro o'quvchi paneli v6 — AI Yordamchi, AI Quiz, kurs progressi, dars jadvali, vazifalar va balans." },
+      { property: "og:title", content: "EduPro — AI Student Dashboard v6" },
+      { property: "og:description", content: "Claude AI, Gemini va GPT-4 bilan qurollangan zamonaviy talaba paneli." },
+      { name: "keywords", content: "edupro, student panel, AI tutor, uzbek education, online learning" },
     ],
     links: [{ rel: "canonical", href: "/" }],
   }),
@@ -34,6 +39,8 @@ function Index() {
       rightRail={
         <>
           <NextLessonCard />
+          <AIInsightsCard />
+          <QuickQuizCard />
           <StudyTimerWidget />
           <AchievementsCard />
           <TodoCard />
@@ -42,6 +49,7 @@ function Index() {
       }
     >
       <HeroBanner />
+      <PromoBanner />
       <CourseProgressCard />
       <div className="grid gap-3 grid-cols-2 md:gap-4 xl:grid-cols-4">
         {stats.map((s, i) => (

@@ -1,16 +1,16 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { Home, BookOpen, Boxes, Timer, User2, LucideIcon } from "lucide-react";
+import { Home, BookOpen, Sparkles, Timer, Brain, LucideIcon } from "lucide-react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 
-type Tab = { to: string; label: string; icon: LucideIcon; primary?: boolean };
+type Tab = { to: string; label: string; icon: LucideIcon; primary?: boolean; aiStyle?: boolean };
 
 const tabs: Tab[] = [
   { to: "/", label: "Bosh", icon: Home },
   { to: "/learning", label: "O'quv", icon: BookOpen },
-  { to: "/gallery", label: "3D", icon: Boxes, primary: true },
+  { to: "/ai-assistant", label: "AI", icon: Sparkles, primary: true, aiStyle: true },
+  { to: "/quiz", label: "Quiz", icon: Brain },
   { to: "/timer", label: "Timer", icon: Timer },
-  { to: "/settings", label: "Profil", icon: User2 },
 ];
 
 export function BottomNav() {
@@ -28,11 +28,14 @@ export function BottomNav() {
                 <Link key={t.to} to={t.to} className="relative -mt-7 flex flex-col items-center">
                   <div
                     className={cn(
-                      "grid h-14 w-14 place-items-center rounded-2xl bg-gradient-primary shadow-glow transition-transform",
+                      "grid h-14 w-14 place-items-center rounded-2xl transition-transform",
+                      t.aiStyle
+                        ? "bg-gradient-to-br from-violet-500 to-purple-600 shadow-[0_8px_24px_-4px_rgba(139,92,246,0.5)]"
+                        : "bg-gradient-primary shadow-glow",
                       active && "scale-110"
                     )}
                   >
-                    <Icon className="h-6 w-6 text-primary-foreground" />
+                    <Icon className="h-6 w-6 text-white" />
                   </div>
                   <span className="mt-1 text-[10px] font-semibold text-foreground">{t.label}</span>
                 </Link>

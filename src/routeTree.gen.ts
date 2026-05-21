@@ -12,10 +12,12 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as TimerRouteImport } from './routes/timer'
 import { Route as SupportRouteImport } from './routes/support'
 import { Route as SettingsRouteImport } from './routes/settings'
+import { Route as QuizRouteImport } from './routes/quiz'
 import { Route as LearningRouteImport } from './routes/learning'
 import { Route as GradesRouteImport } from './routes/grades'
 import { Route as GalleryRouteImport } from './routes/gallery'
 import { Route as FinanceRouteImport } from './routes/finance'
+import { Route as AiAssistantRouteImport } from './routes/ai-assistant'
 import { Route as IndexRouteImport } from './routes/index'
 
 const TimerRoute = TimerRouteImport.update({
@@ -31,6 +33,11 @@ const SupportRoute = SupportRouteImport.update({
 const SettingsRoute = SettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const QuizRoute = QuizRouteImport.update({
+  id: '/quiz',
+  path: '/quiz',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LearningRoute = LearningRouteImport.update({
@@ -53,6 +60,11 @@ const FinanceRoute = FinanceRouteImport.update({
   path: '/finance',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AiAssistantRoute = AiAssistantRouteImport.update({
+  id: '/ai-assistant',
+  path: '/ai-assistant',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -61,20 +73,24 @@ const IndexRoute = IndexRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/ai-assistant': typeof AiAssistantRoute
   '/finance': typeof FinanceRoute
   '/gallery': typeof GalleryRoute
   '/grades': typeof GradesRoute
   '/learning': typeof LearningRoute
+  '/quiz': typeof QuizRoute
   '/settings': typeof SettingsRoute
   '/support': typeof SupportRoute
   '/timer': typeof TimerRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/ai-assistant': typeof AiAssistantRoute
   '/finance': typeof FinanceRoute
   '/gallery': typeof GalleryRoute
   '/grades': typeof GradesRoute
   '/learning': typeof LearningRoute
+  '/quiz': typeof QuizRoute
   '/settings': typeof SettingsRoute
   '/support': typeof SupportRoute
   '/timer': typeof TimerRoute
@@ -82,10 +98,12 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/ai-assistant': typeof AiAssistantRoute
   '/finance': typeof FinanceRoute
   '/gallery': typeof GalleryRoute
   '/grades': typeof GradesRoute
   '/learning': typeof LearningRoute
+  '/quiz': typeof QuizRoute
   '/settings': typeof SettingsRoute
   '/support': typeof SupportRoute
   '/timer': typeof TimerRoute
@@ -94,30 +112,36 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/ai-assistant'
     | '/finance'
     | '/gallery'
     | '/grades'
     | '/learning'
+    | '/quiz'
     | '/settings'
     | '/support'
     | '/timer'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/ai-assistant'
     | '/finance'
     | '/gallery'
     | '/grades'
     | '/learning'
+    | '/quiz'
     | '/settings'
     | '/support'
     | '/timer'
   id:
     | '__root__'
     | '/'
+    | '/ai-assistant'
     | '/finance'
     | '/gallery'
     | '/grades'
     | '/learning'
+    | '/quiz'
     | '/settings'
     | '/support'
     | '/timer'
@@ -125,10 +149,12 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AiAssistantRoute: typeof AiAssistantRoute
   FinanceRoute: typeof FinanceRoute
   GalleryRoute: typeof GalleryRoute
   GradesRoute: typeof GradesRoute
   LearningRoute: typeof LearningRoute
+  QuizRoute: typeof QuizRoute
   SettingsRoute: typeof SettingsRoute
   SupportRoute: typeof SupportRoute
   TimerRoute: typeof TimerRoute
@@ -155,6 +181,13 @@ declare module '@tanstack/react-router' {
       path: '/settings'
       fullPath: '/settings'
       preLoaderRoute: typeof SettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/quiz': {
+      id: '/quiz'
+      path: '/quiz'
+      fullPath: '/quiz'
+      preLoaderRoute: typeof QuizRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/learning': {
@@ -185,6 +218,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FinanceRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/ai-assistant': {
+      id: '/ai-assistant'
+      path: '/ai-assistant'
+      fullPath: '/ai-assistant'
+      preLoaderRoute: typeof AiAssistantRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -197,10 +237,12 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AiAssistantRoute: AiAssistantRoute,
   FinanceRoute: FinanceRoute,
   GalleryRoute: GalleryRoute,
   GradesRoute: GradesRoute,
   LearningRoute: LearningRoute,
+  QuizRoute: QuizRoute,
   SettingsRoute: SettingsRoute,
   SupportRoute: SupportRoute,
   TimerRoute: TimerRoute,
