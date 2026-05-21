@@ -15,6 +15,7 @@ import {
   ChevronsRight,
   Filter,
   RotateCcw,
+  Timer,
 } from "lucide-react";
 import { useApp } from "@/lib/store";
 import { profile } from "@/lib/mock-data";
@@ -23,7 +24,8 @@ import { cn } from "@/lib/utils";
 const nav = [
   { to: "/", label: "Dashboard", icon: LayoutDashboard },
   { to: "/learning", label: "O'quv jarayoni", icon: BookOpen },
-  { to: "/gallery", label: "3D Galereya", icon: Boxes, badge: "NEW" },
+  { to: "/gallery", label: "3D Galereya", icon: Boxes, badge: "3D" },
+  { to: "/timer", label: "Study Timer", icon: Timer, badge: "NEW" },
   { to: "/grades", label: "Davomat va Baholar", icon: BarChart3 },
   { to: "/finance", label: "Moliya va To'lovlar", icon: Wallet },
   { to: "/support", label: "Qo'llab-quvvatlash", icon: Headphones },
@@ -79,7 +81,7 @@ export function Sidebar({ onNavigate, forceExpanded }: { onNavigate?: () => void
             <div className="overflow-hidden">
               <div className="text-base font-bold tracking-tight">EduPro</div>
               <div className="-mt-0.5 text-[10px] uppercase tracking-widest text-muted-foreground">
-                Student v3
+                Student v5
               </div>
             </div>
           )}
@@ -95,7 +97,6 @@ export function Sidebar({ onNavigate, forceExpanded }: { onNavigate?: () => void
         )}
       </div>
 
-      {/* Profile block */}
       <div className={cn("relative px-3", collapsed && "px-2")}>
         <div className={cn("glass-2 relative overflow-hidden rounded-2xl", collapsed ? "p-2" : "p-3.5")}>
           <div className={cn("flex items-center", collapsed ? "justify-center" : "gap-3")}>
@@ -164,7 +165,10 @@ export function Sidebar({ onNavigate, forceExpanded }: { onNavigate?: () => void
               <Icon className="h-[18px] w-[18px] shrink-0" />
               {!collapsed && <span className="truncate">{item.label}</span>}
               {!collapsed && "badge" in item && item.badge && (
-                <span className="ml-auto rounded-md bg-gradient-rose px-1.5 py-0.5 text-[9px] font-bold text-white">
+                <span className={cn(
+                  "ml-auto rounded-md px-1.5 py-0.5 text-[9px] font-bold text-white",
+                  item.badge === "NEW" ? "bg-gradient-rose" : "bg-gradient-primary"
+                )}>
                   {item.badge}
                 </span>
               )}
@@ -173,7 +177,6 @@ export function Sidebar({ onNavigate, forceExpanded }: { onNavigate?: () => void
         })}
       </nav>
 
-      {/* Filters */}
       {!collapsed && (
         <div className="relative mx-3 mb-3 rounded-2xl border border-sidebar-border bg-card/40 p-3.5">
           <div className="flex items-center justify-between">
@@ -190,7 +193,6 @@ export function Sidebar({ onNavigate, forceExpanded }: { onNavigate?: () => void
         </div>
       )}
 
-      {/* Daily goal widget */}
       {!collapsed && (
         <div className="relative mx-3 mb-3 rounded-2xl border border-sidebar-border bg-gradient-card p-3.5">
           <div className="flex items-center justify-between">

@@ -9,6 +9,9 @@ import { ActivityCard } from "@/components/dashboard/ActivityCard";
 import { NextLessonCard } from "@/components/dashboard/NextLessonCard";
 import { TodoCard } from "@/components/dashboard/TodoCard";
 import { BalanceCard } from "@/components/dashboard/BalanceCard";
+import { NewsCard } from "@/components/dashboard/NewsCard";
+import { LeaderboardCard } from "@/components/dashboard/LeaderboardCard";
+import { StudyTimerWidget } from "@/components/dashboard/StudyTimerWidget";
 import { stats } from "@/lib/mock-data";
 
 export const Route = createFileRoute("/")({
@@ -30,25 +33,28 @@ function Index() {
       rightRail={
         <>
           <NextLessonCard />
+          <StudyTimerWidget />
           <TodoCard />
           <BalanceCard />
         </>
       }
     >
       <CourseProgressCard />
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="grid gap-3 grid-cols-2 md:gap-4 xl:grid-cols-4">
         {stats.map((s, i) => (
           <StatCard key={s.key} stat={s} index={i} />
         ))}
       </div>
-      <div className="grid gap-5 lg:grid-cols-2">
+      <NewsCard />
+      <div className="grid gap-4 lg:grid-cols-2">
         <ScheduleCard />
         <CoursesCard />
       </div>
-      <div className="grid gap-5 lg:grid-cols-2">
+      <div className="grid gap-4 lg:grid-cols-2">
         <SkillsRadar />
         <ActivityCard />
       </div>
+      <LeaderboardCard />
     </AppShell>
   );
 }

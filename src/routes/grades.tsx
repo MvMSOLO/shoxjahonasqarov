@@ -5,7 +5,9 @@ import { SkillsRadar } from "@/components/dashboard/SkillsRadar";
 import { useMemo, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Search, Download, Trophy, CalendarCheck2, Clock, AlertCircle } from "lucide-react";
+import { motion } from "framer-motion";
 import { toast } from "sonner";
+import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/grades")({
   head: () => ({ meta: [{ title: "Davomat va Baholar — EduPro" }], links: [{ rel: "canonical", href: "/grades" }] }),
@@ -30,16 +32,15 @@ const certs = [
   { id: "c3", name: "UI/UX Sprint", date: "Jan 2025", color: "from-rose-500 to-pink-500" },
 ];
 
-// 30 days attendance heatmap (0..4 intensity)
 const attendance = Array.from({ length: 35 }, (_, i) => {
   const v = (i * 7 + 3) % 5;
   return { day: i + 1, v };
 });
 
-const statusColors: Record<Grade["status"], string> = {
-  "Topshirilgan": "bg-success/15 text-success",
-  "Kutilmoqda": "bg-warning/15 text-warning",
-  "O'tkazib yuborilgan": "bg-destructive/15 text-destructive",
+const statusConfig: Record<Grade["status"], { cls: string; dot: string }> = {
+  "Topshirilgan": { cls: "bg-success/15 text-success", dot: "bg-success" },
+  "Kutilmoqda": { cls: "bg-warning/15 text-warning", dot: "bg-warning" },
+  "O'tkazib yuborilgan": { cls: "bg-destructive/15 text-destructive", dot: "bg-destructive" },
 };
 
 function GradesPage() {
@@ -62,10 +63,10 @@ function GradesPage() {
 
   return (
     <AppShell>
-      <div className="glass rounded-3xl p-6 shadow-card md:p-8">
+      <div className="glass rounded-3xl p-4 shadow-card md:p-6">
         <h1 className="text-2xl font-bold md:text-3xl">Davomat va Baholar</h1>
-        <p className="mt-2 text-sm text-muted-foreground md:text-base">Baholar, davomat heatmap va sertifikatlaringizni bir joyda ko'ring.</p>
-        <div className="mt-4 grid grid-cols-2 gap-3 md:grid-cols-4">
+        <p className="mt-1 text-sm text-muted-foreground">Baholar, davomat heatmap va sertifikatlaringizni bir joyda ko'ring.</p>
+        <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4 md:gap-3">
           <Stat label="O'rtacha ball" value={`${avg}/100`} icon={Trophy} />
           <Stat label="Davomat" value={`${attendPct}%`} icon={CalendarCheck2} />
           <Stat label="Kechikkan" value="2" icon={Clock} />
@@ -73,8 +74,8 @@ function GradesPage() {
         </div>
       </div>
 
-      <Tabs defaultValue="grades" className="mt-5">
-        <TabsList>
+      <Tabs defaultValue="grades" className="mt-4">
+        <TabsList className="w-full justify-start overflow-x-auto">
           <TabsTrigger value="grades">Baholar</TabsTrigger>
           <TabsTrigger value="attend">Davomat</TabsTrigger>
           <TabsTrigger value="certs">Sertifikatlar</TabsTrigger>
@@ -82,7 +83,7 @@ function GradesPage() {
         </TabsList>
 
         <TabsContent value="grades">
-          <div className="glass rounded-2xl p-4 shadow-card md:p-5">
+          <div className="glass rounded-2xl p-3 shadow-card md:p-5">
             <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
               <div className="relative flex-1">
                 <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -93,7 +94,9 @@ function GradesPage() {
                 <SortBtn active={sort === "score"} onClick={() => setSort("score")}>Ball</SortBtn>
               </div>
             </div>
-            <div className="mt-4 overflow-x-auto">
+
+            {/* Desktop table */}
+            <div className="mt-4 hidden overflow-x-auto md:block">
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-border text-left text-xs uppercase tracking-wider text-muted-foreground">
@@ -106,13 +109,24 @@ function GradesPage() {
                 </thead>
                 <tbody>
                   {filtered.map((g) => (
-                    <tr key={g.id} className="border-b border-border/40 last:border-0">
+                    <tr key={g.id} className="border-b border-border/40 transition-colors last:border-0 hover:bg-accent/30">
                       <td className="py-3 pr-3 font-medium">{g.course}</td>
                       <td className="py-3 pr-3 text-muted-foreground">{g.task}</td>
-                      <td className="py-3 pr-3 font-semibold">{g.status === "Topshirilgan" ? `${g.score}/${g.max}` : "—"}</td>
+                      <td className="py-3 pr-3 font-semibold">
+                        {g.status === "Topshirilgan" ? (
+                          <span className={cn(
+                            "font-bold",
+                            g.score >= 90 ? "text-success" : g.score >= 75 ? "text-warning" : "text-destructive"
+                          )}>
+                            {g.score}/{g.max}
+                          </span>
+                        ) : "—"}
+                      </td>
                       <td className="py-3 pr-3 text-muted-foreground">{g.date}</td>
                       <td className="py-3">
-                        <span className={`rounded-md px-2 py-1 text-[11px] font-semibold ${statusColors[g.status]}`}>{g.status}</span>
+                        <span className={cn("rounded-md px-2 py-1 text-[11px] font-semibold", statusConfig[g.status].cls)}>
+                          {g.status}
+                        </span>
                       </td>
                     </tr>
                   ))}
@@ -122,21 +136,74 @@ function GradesPage() {
                 </tbody>
               </table>
             </div>
+
+            {/* Mobile cards */}
+            <div className="mt-3 space-y-2 md:hidden">
+              {filtered.map((g, i) => {
+                const cfg = statusConfig[g.status];
+                return (
+                  <motion.div
+                    key={g.id}
+                    initial={{ opacity: 0, y: 6 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.03 * i }}
+                    className="rounded-xl border border-border/60 p-3"
+                  >
+                    <div className="flex items-start justify-between gap-2">
+                      <div>
+                        <div className="text-sm font-semibold">{g.course}</div>
+                        <div className="text-xs text-muted-foreground">{g.task}</div>
+                      </div>
+                      <span className={cn("shrink-0 rounded-md px-2 py-0.5 text-[10px] font-semibold", cfg.cls)}>
+                        {g.status}
+                      </span>
+                    </div>
+                    <div className="mt-2 flex items-center justify-between text-xs">
+                      <span className="text-muted-foreground">{g.date}</span>
+                      {g.status === "Topshirilgan" ? (
+                        <span className={cn(
+                          "font-bold text-base",
+                          g.score >= 90 ? "text-success" : g.score >= 75 ? "text-warning" : "text-destructive"
+                        )}>
+                          {g.score}<span className="text-xs font-normal text-muted-foreground">/{g.max}</span>
+                        </span>
+                      ) : (
+                        <span className="text-muted-foreground">—</span>
+                      )}
+                    </div>
+                    {g.status === "Topshirilgan" && (
+                      <div className="mt-2 h-1 overflow-hidden rounded-full bg-muted">
+                        <div
+                          className={cn(
+                            "h-full rounded-full",
+                            g.score >= 90 ? "bg-gradient-success" : g.score >= 75 ? "bg-gradient-warning" : "bg-destructive"
+                          )}
+                          style={{ width: `${g.score}%` }}
+                        />
+                      </div>
+                    )}
+                  </motion.div>
+                );
+              })}
+              {filtered.length === 0 && (
+                <div className="py-6 text-center text-sm text-muted-foreground">Hech narsa topilmadi</div>
+              )}
+            </div>
           </div>
         </TabsContent>
 
         <TabsContent value="attend">
-          <div className="glass rounded-2xl p-5 shadow-card">
+          <div className="glass rounded-2xl p-4 shadow-card md:p-5">
             <div className="flex items-center justify-between">
               <h2 className="text-base font-bold">35 kunlik davomat</h2>
               <span className="text-sm text-muted-foreground">Bu oy: <span className="font-bold text-foreground">{attendPct}%</span></span>
             </div>
-            <div className="mt-4 grid grid-cols-7 gap-1.5 sm:grid-cols-7">
+            <div className="mt-4 grid grid-cols-7 gap-1 sm:gap-1.5">
               {attendance.map((d) => (
                 <div
                   key={d.day}
                   title={`Kun ${d.day} — ${["Yo'q", "Sabsiz", "Kechikkan", "Kelgan", "Aktiv"][d.v]}`}
-                  className="aspect-square rounded-md"
+                  className="aspect-square rounded-md transition-transform hover:scale-110"
                   style={{
                     background:
                       d.v === 0 ? "oklch(0.25 0.02 270 / 60%)" :
@@ -154,26 +221,69 @@ function GradesPage() {
               <Legend color="oklch(0.65 0.18 160 / 80%)" label="Kelgan" />
               <Legend color="oklch(0.72 0.2 165)" label="Aktiv" />
             </div>
+
+            <div className="mt-4 grid grid-cols-3 gap-2">
+              {[
+                { label: "Kelgan kunlar", value: present, color: "text-success" },
+                { label: "Kechikkan", value: 2, color: "text-warning" },
+                { label: "Sabsiz", value: 1, color: "text-destructive" },
+              ].map((item) => (
+                <div key={item.label} className="rounded-xl bg-muted/60 p-2.5 text-center">
+                  <div className={cn("text-xl font-bold", item.color)}>{item.value}</div>
+                  <div className="text-[10px] text-muted-foreground">{item.label}</div>
+                </div>
+              ))}
+            </div>
           </div>
         </TabsContent>
 
         <TabsContent value="certs">
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {certs.map((c) => (
-              <div key={c.id} className={`relative overflow-hidden rounded-2xl bg-gradient-to-br ${c.color} p-5 text-white shadow-card`}>
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {certs.map((c, i) => (
+              <motion.div
+                key={c.id}
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.05 * i }}
+                className={`relative overflow-hidden rounded-2xl bg-gradient-to-br ${c.color} p-5 text-white shadow-card`}
+              >
                 <div className="absolute -right-6 -top-6 h-24 w-24 rounded-full bg-white/20 blur-2xl" />
+                <div className="absolute -left-4 -bottom-4 h-16 w-16 rounded-full bg-white/10 blur-xl" />
                 <Trophy className="h-8 w-8" />
                 <div className="mt-3 text-xs uppercase tracking-widest text-white/80">Sertifikat</div>
                 <div className="mt-1 text-lg font-bold">{c.name}</div>
                 <div className="text-xs text-white/80">{c.date}</div>
-                <button
-                  onClick={() => toast.success(`${c.name} yuklanmoqda...`)}
-                  className="mt-4 inline-flex items-center gap-1.5 rounded-lg bg-white/20 px-3 py-1.5 text-xs font-semibold backdrop-blur transition-colors hover:bg-white/30"
-                >
-                  <Download className="h-3.5 w-3.5" /> Yuklab olish
-                </button>
-              </div>
+                <div className="mt-4 flex gap-2">
+                  <button
+                    onClick={() => toast.success(`${c.name} yuklanmoqda...`)}
+                    className="inline-flex items-center gap-1.5 rounded-lg bg-white/20 px-3 py-1.5 text-xs font-semibold backdrop-blur transition-colors hover:bg-white/30"
+                  >
+                    <Download className="h-3.5 w-3.5" /> Yuklab olish
+                  </button>
+                  <button
+                    onClick={() => toast.success(`${c.name} ulashildi`)}
+                    className="inline-flex items-center gap-1.5 rounded-lg bg-white/10 px-3 py-1.5 text-xs font-semibold backdrop-blur transition-colors hover:bg-white/20"
+                  >
+                    Ulashish
+                  </button>
+                </div>
+              </motion.div>
             ))}
+
+            <motion.div
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.15 }}
+              className="flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-border p-5 text-center"
+            >
+              <div className="text-3xl">🎓</div>
+              <div className="mt-2 text-sm font-semibold">Keyingi sertifikat</div>
+              <div className="mt-1 text-xs text-muted-foreground">Python Backend kursini yakunlang</div>
+              <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-muted">
+                <div className="h-full w-[45%] rounded-full bg-gradient-primary" />
+              </div>
+              <div className="mt-1 text-[10px] text-muted-foreground">45% yakunlandi</div>
+            </motion.div>
           </div>
         </TabsContent>
 
@@ -185,11 +295,11 @@ function GradesPage() {
   );
 }
 
-function Stat({ label, value, icon: Icon }: { label: string; value: string; icon: any }) {
+function Stat({ label, value, icon: Icon }: { label: string; value: string; icon: React.ComponentType<{ className?: string }> }) {
   return (
     <div className="rounded-2xl border border-border bg-card p-3">
       <div className="flex items-center justify-between">
-        <span className="text-xs text-muted-foreground">{label}</span>
+        <span className="text-[10px] text-muted-foreground sm:text-xs">{label}</span>
         <Icon className="h-3.5 w-3.5 text-muted-foreground" />
       </div>
       <div className="mt-1 text-lg font-bold">{value}</div>
@@ -210,9 +320,10 @@ function SortBtn({ active, onClick, children }: { active: boolean; onClick: () =
   return (
     <button
       onClick={onClick}
-      className={`rounded-lg border px-3 py-1.5 text-xs font-semibold transition-colors ${
+      className={cn(
+        "rounded-lg border px-3 py-1.5 text-xs font-semibold transition-colors",
         active ? "border-primary bg-primary/10 text-primary" : "border-border bg-card text-muted-foreground hover:bg-accent"
-      }`}
+      )}
     >
       {children}
     </button>

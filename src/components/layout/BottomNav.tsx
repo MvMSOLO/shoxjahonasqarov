@@ -1,5 +1,5 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { Home, BookOpen, Wallet, User2, Boxes, LucideIcon } from "lucide-react";
+import { Home, BookOpen, Boxes, Timer, User2, LucideIcon } from "lucide-react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 
@@ -9,7 +9,7 @@ const tabs: Tab[] = [
   { to: "/", label: "Bosh", icon: Home },
   { to: "/learning", label: "O'quv", icon: BookOpen },
   { to: "/gallery", label: "3D", icon: Boxes, primary: true },
-  { to: "/finance", label: "Moliya", icon: Wallet },
+  { to: "/timer", label: "Timer", icon: Timer },
   { to: "/settings", label: "Profil", icon: User2 },
 ];
 
@@ -18,7 +18,7 @@ export function BottomNav() {
 
   return (
     <nav className="safe-bottom fixed inset-x-0 bottom-0 z-40 lg:hidden">
-      <div className="mx-3 mb-3 rounded-3xl border border-border/60 bg-background/85 px-2 pb-1.5 pt-2 shadow-[0_8px_40px_-8px_rgba(0,0,0,0.5)] backdrop-blur-2xl">
+      <div className="mx-3 mb-3 rounded-3xl border border-border/60 bg-background/90 px-2 pb-1.5 pt-2 shadow-[0_8px_40px_-8px_rgba(0,0,0,0.5)] backdrop-blur-2xl">
         <div className="relative grid grid-cols-5">
           {tabs.map((t) => {
             const active = path === t.to;
